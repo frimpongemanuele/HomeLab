@@ -222,8 +222,101 @@ Remote access is handled through:
 •	WireGuard
 
 This reduces the attack surface significantly.
-Public Internet
+<br>Public Internet
 <br>│
 <br>└── No exposed Jellyfin / Proxmox / Home Assistant ports
 
+## Service Isolation
 
+Services are separated by workload:
+Home Assistant    → VM
+Jellyfin          → LXC
+Docker stack      → Dedicated LXC
+Tailscale         → Dedicated LXC
+Dashboard         → Dedicated LXC
+This limits the impact of a compromise.
+
+## API Tokens Instead of Passwords
+
+Homepage integrates with Proxmox using an API token:
+username: root@username
+password: TOKEN_SECRET
+
+Because this is better than storing a full root password.
+
+## Backup Strategy
+
+Backups are implemented at multiple levels:
+Home Assistant → Google Drive backup
+Proxmox VM/LXC → scheduled Proxmox backups
+Media/configs  → external HDD
+
+## Snapshot-Based Update Workflow
+
+Before risky updates:
+1. Create snapshot
+2. Apply update
+3. Test service
+4. If successful → delete snapshot
+5. If broken → rollback
+
+## SMB Security
+
+Samba was configured with a real user instead of guest access:
+adduser mediauser
+smbpasswd -a mediauser
+
+Example share:
+[media]
+path = /mnt/media
+browseable = yes
+writable = yes
+valid users = mediauser
+force user = mediauser
+force group = mediauser
+create mask = 0777
+directory mask = 0777
+
+SMB1 was identified as insecure and should remain disabled.
+
+## Threat Model
+
+This lab simulates and mitigates several realistic risks:
+
+| Risk | Mitigation |
+| ------------- | ------------- |
+|Public service exposure |	No port forwarding, VPN-only access |
+|Weak remote access |	Tailscale/WireGuard |
+|Misconfigured services	| Service isolation |
+|Broken updates	| Snapshots and rollback |
+|Data loss	Multi-layer | backup strategy |
+|Credential leakage	| API tokens instead of passwords |
+|Container escape risk	| Service separation and limited scope |
+|Storage failure	| External backup strategy |
+
+## Possible Attack Surfaces
+
+•	Proxmox web interface
+•	Home Assistant web UI
+•	Jellyfin web UI
+•	Docker containers
+•	qBittorrent web interface
+•	SMB share
+•	API tokens
+•	VPN endpoints
+•	Misconfigured reverse proxy in the future
+
+## Defensive Strategies Applied
+
+•	Keep management interfaces private
+•	Avoid exposing services directly to the internet
+•	Use VPN for remote access
+•	Use snapshots before updates
+•	Use dedicated containers for different workloads
+•	Use API tokens with limited scope where possible
+•	Disable legacy protocols such as SMB1
+•	Maintain backup copies of critical configurations
+
+
+# Use Cases & What I Practiced
+...
