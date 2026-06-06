@@ -116,7 +116,7 @@ Key points:
 Jellyfin was installed in an LXC container.
 
 Container details:
-Container ID: XXX
+Container ID: 101
 Hostname: jellyfin
 IP address: 192.168.XXX.XXX
 Port: 8096
@@ -153,5 +153,77 @@ Disabled initially:
 - Tone mapping
 
 ### Docker LXC
+Docker was installed inside LXC 102.
+
+To support nested Docker, the LXC configuration was modified:
+features: nesting=1,keyctl=1
+lxc.apparmor.profile: unconfined
+For specific Docker containers, AppArmor was disabled:
+security_opt:
+  - apparmor=unconfined
+This was required because Docker inside LXC can conflict with AppArmor profiles.
+
+## Media Automation Stack
+
+The following services were deployed with Docker Compose:
+qBittorrent
+Radarr
+Sonarr
+Prowlarr
+Bazarr
+
+Media pipeline:
+Prowlarr → Sonarr/Radarr → qBittorrent → Downloads → Media Library → Jellyfin
+
+Path consistency was critical:
+/media/movies
+/media/tv
+
+All containers were configured to use consistent media paths to avoid import errors.
+
+## External HDD Mount
+The final storage design uses exFAT for portability.
+
+Example mount workflow:
+apt update
+apt install -y exfatprogs
+
+mkdir -p /mnt/media
+lsblk -f
+blkid
+
+Safe /etc/fstab entry:
+UUID=XXXX-XXXX /mnt/media exfat defaults,nofail,uid=1000,gid=1000,umask=000 0 0
+The nofail option is important because it prevents Proxmox from entering emergency mode if the external disk is disconnected during boot.
+
+## Bind Mount to Jellyfin
+
+The media drive is bind-mounted into the Jellyfin container:
+pct set 101 -protection 0
+pct set 101 -mp0 /mnt/media,mp=/media
+pct set 101 -protection 1
+
+Inside the container:
+ls /media
+
+Expected result:
+movies
+tv
+
+# Cybersecurity Focus
+Security was one of the main design goals of this home lab.
+
+Implemented Security Measures
+Remote Access Without Port Forwarding
+No services are directly exposed to the public internet.
+
+Remote access is handled through:
+•	Tailscale
+•	WireGuard
+
+This reduces the attack surface significantly.
+Public Internet
+    │
+    └── No exposed Jellyfin / Proxmox / Home Assistant ports
 
 
