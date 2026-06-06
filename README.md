@@ -96,6 +96,62 @@ Remote access is handled through Tailscale and WireGuard, avoiding unsage public
 | exFAT	| Portable HDD filesystem	| Compatible with Linux, Windows and macOS |
 
 ## Setup & Deployment
+- Proxmox Installation
+Proxmox VE was installed on a Lenovo mini PC used as the main virtualization layer.
 
+Main storage:
+NVMe SSD → Proxmox system storage
+External 3TB HDD → media and backup storage
+
+# Home Assistant VM
+Home Assistant OS was deployed as a VM.
+
+Key points:
+•	Restored from an existing backup
+•	Used for smart home automation
+•	WireGuard configured for remote access
+•	Google Drive backup configured for off-site backup
+
+# Jellyfin LXC
+Jellyfin was installed in an LXC container.
+
+Container details:
+Container ID: XXX
+Hostname: jellyfin
+IP address: 192.168.XXX.XXX
+Port: 8096
+Jellyfin libraries:
+Movies → /movies
+TV     → /tv
+
+- Intel GPU Passthrough for Jellyfin
+The Proxmox host exposed Intel GPU devices:
+/dev/dri/card0
+/dev/dri/renderD128
+
+The Jellyfin user was added to the required groups:
+usermod -aG video jellyfin
+usermod -aG render jellyfin
+VAAPI was enabled in Jellyfin:
+Hardware acceleration: VAAPI
+VAAPI device: /dev/dri/renderD128
+Hardware encoding: Enabled
+Tone mapping: Disabled initially
+
+Recommended decoding options:
+Enabled:
+- H264
+- HEVC
+- HEVC 10-bit
+- VP9
+- VP9 10-bit
+
+Disabled initially:
+- AV1
+- Low-power H264 encoder
+- Low-power HEVC encoder
+- Tone mapping
+
+# Docker LXC
 
 
