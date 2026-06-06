@@ -103,7 +103,7 @@ Main storage:
 NVMe SSD → Proxmox system storage
 External 3TB HDD → media and backup storage
 
-# Home Assistant VM
+### Home Assistant VM
 Home Assistant OS was deployed as a VM.
 
 Key points:
@@ -112,7 +112,7 @@ Key points:
 •	WireGuard configured for remote access
 •	Google Drive backup configured for off-site backup
 
-# Jellyfin LXC
+### Jellyfin LXC
 Jellyfin was installed in an LXC container.
 
 Container details:
@@ -152,6 +152,6 @@ Disabled initially:
 - Low-power HEVC encoder
 - Tone mapping
 
-# Docker LXC
+### Docker LXC
 
 
