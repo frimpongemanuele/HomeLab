@@ -156,11 +156,13 @@ Disabled initially:
 Docker was installed inside LXC 102.
 
 To support nested Docker, the LXC configuration was modified:
-features: nesting=1,keyctl=1
-lxc.apparmor.profile: unconfined
+<br> features: nesting=1,keyctl=1
+<br> lxc.apparmor.profile: unconfined
+
 For specific Docker containers, AppArmor was disabled:
-security_opt:
+<br> security_opt:
   - apparmor=unconfined
+
 This was required because Docker inside LXC can conflict with AppArmor profiles.
 
 ## Media Automation Stack
@@ -194,6 +196,7 @@ blkid
 
 Safe /etc/fstab entry:
 UUID=XXXX-XXXX /mnt/media exfat defaults,nofail,uid=1000,gid=1000,umask=000 0 0
+
 The nofail option is important because it prevents Proxmox from entering emergency mode if the external disk is disconnected during boot.
 
 ## Bind Mount to Jellyfin
@@ -207,19 +210,19 @@ Inside the container:
 ls /media
 
 Expected result:
-movies
-tv
+<br> movies
+<br> tv
 
 # Cybersecurity Focus
 Security was one of the main design goals of this home lab.
 
-Implemented Security Measures
-Remote Access Without Port Forwarding
-No services are directly exposed to the public internet.
+Implemented Security Measures:
+<br> Remote Access Without Port Forwarding
+<br> No services are directly exposed to the public internet.
 
 Remote access is handled through:
-•	Tailscale
-•	WireGuard
+-	Tailscale
+-	WireGuard
 
 This reduces the attack surface significantly.
 <br>Public Internet
@@ -239,17 +242,17 @@ This limits the impact of a compromise.
 ## API Tokens Instead of Passwords
 
 Homepage integrates with Proxmox using an API token:
-username: root@username
-password: TOKEN_SECRET
+<br> username: root@username
+<br> password: TOKEN_SECRET
 
 Because this is better than storing a full root password.
 
 ## Backup Strategy
 
 Backups are implemented at multiple levels:
-Home Assistant → Google Drive backup
-Proxmox VM/LXC → scheduled Proxmox backups
-Media/configs  → external HDD
+<br> Home Assistant → Google Drive backup
+<br> Proxmox VM/LXC → scheduled Proxmox backups
+<br> Media/configs  → external HDD
 
 ## Snapshot-Based Update Workflow
 
@@ -263,8 +266,8 @@ Before risky updates:
 ## SMB Security
 
 Samba was configured with a real user instead of guest access:
-adduser mediauser
-smbpasswd -a mediauser
+<br> adduser mediauser
+<br> smbpasswd -a mediauser
 
 Example share:
 [media]
@@ -296,26 +299,26 @@ This lab simulates and mitigates several realistic risks:
 
 ## Possible Attack Surfaces
 
-•	Proxmox web interface
-•	Home Assistant web UI
-•	Jellyfin web UI
-•	Docker containers
-•	qBittorrent web interface
-•	SMB share
-•	API tokens
-•	VPN endpoints
-•	Misconfigured reverse proxy in the future
+- Proxmox web interface
+-	Home Assistant web UI
+-	Jellyfin web UI
+-	Docker containers
+-	qBittorrent web interface
+-	SMB share
+-	API tokens
+-	VPN endpoints
+-	Misconfigured reverse proxy in the future
 
 ## Defensive Strategies Applied
 
-•	Keep management interfaces private
-•	Avoid exposing services directly to the internet
-•	Use VPN for remote access
-•	Use snapshots before updates
-•	Use dedicated containers for different workloads
-•	Use API tokens with limited scope where possible
-•	Disable legacy protocols such as SMB1
-•	Maintain backup copies of critical configurations
+-	Keep management interfaces private
+-	Avoid exposing services directly to the internet
+-	Use VPN for remote access
+-	Use snapshots before updates
+-	Use dedicated containers for different workloads
+-	Use API tokens with limited scope where possible
+-	Disable legacy protocols such as SMB1
+-	Maintain backup copies of critical configurations
 
 
 # Use Cases & What I Practiced
