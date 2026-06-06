@@ -223,7 +223,7 @@ Remote access is handled through:
 
 This reduces the attack surface significantly.
 Public Internet
-    │
-    └── No exposed Jellyfin / Proxmox / Home Assistant ports
+<br>│
+<br>└── No exposed Jellyfin / Proxmox / Home Assistant ports
 
 
