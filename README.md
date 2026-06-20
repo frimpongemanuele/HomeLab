@@ -409,17 +409,17 @@ For automation stacks, write access must be planned carefully.
 After reboot, Proxmox entered emergency mode because the external HDD mount failed.
 
 Error pattern:
-Timed out waiting for device
+<br> Timed out waiting for device
 
 Dependency failed for /mnt/media
 Dependency failed for local-fs.target
 
 Solution:
-The strict fstab entry was removed/commented.
+<br> The strict fstab entry was removed/commented.
 The final mount strategy uses nofail.
 
 Correct approach:
-UUID=XXXX-XXXX /mnt/media exfat defaults,nofail,uid=1000,gid=1000,umask=000 0 0
+<br> UUID=XXXX-XXXX /mnt/media exfat defaults,nofail,uid=1000,gid=1000,umask=000 0 0
 
 ## 4: Data recovery
 
@@ -431,10 +431,10 @@ Tools tested:
 -	PhotoRec
 
 Result:
-Original folder structure was mostly lost, but many raw media files were recovered.
+<br> Original folder structure was mostly lost, but many raw media files were recovered.
 
 Lesson:
-Data recovery is possible, but prevention is better.
+<br> Data recovery is possible, but prevention is better.
 Read-only inspection should always happen before disk modification.
 
 ## 5: Docker inside LXC
@@ -442,10 +442,10 @@ Read-only inspection should always happen before disk modification.
 Docker initially failed because of AppArmor restrictions.
 
 Error:
-AppArmor enabled but docker-default profile could not be loaded
+<br> AppArmor enabled but docker-default profile could not be loaded
 
 Solution:
-features: nesting=1,keyctl=1
+<br> features: nesting=1,keyctl=1
 lxc.apparmor.profile: unconfined
 
 Lesson:
