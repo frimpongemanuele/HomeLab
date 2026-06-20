@@ -41,7 +41,7 @@ My fist lab was setup simply with an older laptop based server which is being re
 
 ## Key Technologies:
 
-- Proxmox VE
+-  VE
 - Home Assistant OS VM
 - Jellyfin LXC
 - Docker LXC
@@ -55,7 +55,7 @@ My fist lab was setup simply with an older laptop based server which is being re
   - No public port forwarding
 - [Tailscale VPN / WireGuard]
   - [Home LAN]
-- [Proxmox Host]
+- [ Host]
   - Home Assistant VM
   - Jellyfin LXC
   - Docker LXC
@@ -72,6 +72,8 @@ Jellyfin runs inside an LXC container for lightweight performance adn direct acc
 
 Docker is deployed inside a separate LXC container. This container hosts the media automation stack, keeping Docker workloads isolated from both Proxmox host and Jellyfin.
 Remote access is handled through Tailscale and WireGuard, avoiding unsage public exposure of internal services.
+
+![alt text](https://github.com/frimpongemanuele/HomeLab/blob/main/media/ProxmoxScreen.png)
 
 ## Tech Stack
 
