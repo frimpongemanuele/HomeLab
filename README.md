@@ -322,4 +322,30 @@ This lab simulates and mitigates several realistic risks:
 
 
 # Use Cases & What I Practiced
-...
+
+## Virtualization
+
+- Installed and configured Proxmox VE
+- Created and managed VMs and LXC containers
+- Used snapshots and backup jobs
+- Managed external storage mounts
+
+## Containerization
+
+-	Configured Docker inside LXC
+-	Solved AppArmor and nesting issues
+-	Deployed services with Docker Compose
+-	Managed persistent volumes and container paths
+
+## Networking
+
+-	Assigned static LAN IPs
+-	Troubleshot IP conflicts
+-	Configured local DNS concepts such as:
+-	- frimflix.local
+- - frimflix.home
+-	Used VPN-based remote access
+-	Avoided public port forwarding
+
+## Cybersecurity
+
