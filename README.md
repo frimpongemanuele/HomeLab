@@ -342,10 +342,212 @@ This lab simulates and mitigates several realistic risks:
 -	Assigned static LAN IPs
 -	Troubleshot IP conflicts
 -	Configured local DNS concepts such as:
--	- frimflix.local
-- - frimflix.home
+	- frimflix.local
+  - frimflix.home
 -	Used VPN-based remote access
 -	Avoided public port forwarding
 
 ## Cybersecurity
+
+-	Designed a low-exposure remote access model
+-	Used VPN instead of open ports
+-	Managed API tokens
+-	Disabled insecure legacy SMB behavior
+-	Practiced backup and recovery workflows
+
+## Media Automation
+
+-	Configured Jellyfin
+-	Connected *arr-stack (media manager)
+-	Designed media paths for automated imports
+-	Tuned hardware transcoding
+
+## Incident Recovery
+
+A major real-world incident occurred during storage migration.
+
+The external 3TB HDD was accidentally modified during partitioning and formatting attempts. Recovery tools such as TestDisk, R-Studio and PhotoRec were used to recover media files.
+
+Lessons learned:
+
+- Always identify disks before formatting
+-	Use read-only mounting first
+-	Never run destructive commands on disks containing data
+-	Keep raw recovery output untouched
+-	Validate backups before modifying storage
+
+
+# Challenge & Lessons Learned
+
+## 1: Jeelyfin was not reachable locally
+
+Jellyfin worked through VPN but not from the local PC.
+
+Root cause:
+Old laptop/server was still running and causing a conflict
+
+Solution:
+The old server was fully shut down and the new Jellyfin intance restored.
+
+## 2: LXC bind mount permissions
+
+Because Jellyfin runs inside an unprivileged LXC, permissions on bind-mounted storage behaved differently.
+
+Example issue:
+chown -R 1000:1000 /media
+
+Result:
+Operation not permitted
+
+Lesson:
+Unprivileged containers require careful UID/GID mapping.
+For read-only media consumption, read access is enough.
+For automation stacks, write access must be planned carefully.
+
+## 3: Proxmox boot failure due to fstab
+
+After reboot, Proxmox entered emergency mode because the external HDD mount failed.
+
+Error pattern:
+Timed out waiting for device
+
+Dependency failed for /mnt/media
+Dependency failed for local-fs.target
+
+Solution:
+The strict fstab entry was removed/commented.
+The final mount strategy uses nofail.
+
+Correct approach:
+UUID=XXXX-XXXX /mnt/media exfat defaults,nofail,uid=1000,gid=1000,umask=000 0 0
+
+## 4: Data recovery
+
+The 3TB HDD filesystem metadata was damaged.
+
+Tools tested:
+-	TestDisk
+-	R-Studio
+-	PhotoRec
+
+Result:
+Original folder structure was mostly lost, but many raw media files were recovered.
+
+Lesson:
+Data recovery is possible, but prevention is better.
+Read-only inspection should always happen before disk modification.
+
+## 5: Docker inside LXC
+
+Docker initially failed because of AppArmor restrictions.
+
+Error:
+AppArmor enabled but docker-default profile could not be loaded
+
+Solution:
+features: nesting=1,keyctl=1
+lxc.apparmor.profile: unconfined
+
+Lesson:
+Docker inside LXC is possible, but it requires careful configuration and has security trade-offs
+
+# Improvments (In progress...)
+
+## security improvements
+
+- Complete VLAN segmentation:
+  -	Management VLAN
+  -	IoT VLAN
+  -	Media VLAN
+  -	Guest VLAN
+-	Add firewall rules between VLANs
+-	Restrict Proxmox access only to trusted admin devices
+-	Use a reverse proxy only through VPN or with strong authentication
+-	Add intrusion detection with Wazuh or Suricata
+-	Centralize logs with Loki, Graylog or ELK
+-	Add fail2ban where applicable
+
+## VPN improvements
+
+Future torrent traffic should be isolated through Gluetun:
+
+qBittorrent → Gluetun VPN → Internet
+
+Important design rule:
+Only download traffic should use the privacy VPN.
+
+Home Assistant and Jellyfin should not be routed through the torrent VPN.
+
+## Monitoring improvements (Deployed)
+
+-	Grafana dashboards
+-	Prometheus metrics
+-	Proxmox exporter
+-	Uptime Kuma
+-	Jellyfin usage metrics
+-	Home Assistant system metrics
+
+## Backup improvements
+
+-	Separate backup disk from media disk
+-	Add off-site encrypted backups
+-	Automate config exports
+-	Version-control Docker Compose files
+-	Add restore testing schedule
+
+## Automation improvements
+
+-	Ansible playbooks for repeatable deployment
+-	GitHub repository for infrastructure configs
+-	Automated container updates with manual approval
+-	Secrets management with SOPS or Ansible Vault
+
+
+# Portfolio Angle
+
+The goal of this project is to demonstrates practical skills relevant to cybersecurity, DevOps and systems administration.
+
+## Skills used:
+
+-	Linux system administration
+-	Proxmox virtualization
+-	LXC container management
+-	Docker and Docker Compose
+-	Network troubleshooting
+-	VPN-based secure access
+-	Storage management
+-	Backup planning
+-	Incident recovery
+-	Media automation
+-	API token usage
+-	Service hardening
+-	Dashboard and monitoring setup
+
+## Why This Project Matters
+
+This is not just my home server/lab. It is a realistic self-hosted infrastructure project that includes:
+
+-	Segmented workloads
+-	Secure remote access
+-	Backup strategy
+-	Monitoring dashboard
+-	Automation stack
+-	Real troubleshooting history
+-	Real incident recovery
+-	Practical cybersecurity decisions
+
+For recruiters:
+
+-	Design infrastructure
+-	Document technical decisions
+-	Troubleshoot complex problems
+-	Think in terms of risk and resilience
+-	Build systems that are usable, secure and maintainable
+
+# Visualization & Tools suggestions
+
+
+
+
+
 
