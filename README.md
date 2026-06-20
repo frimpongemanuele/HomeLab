@@ -73,7 +73,7 @@ Jellyfin runs inside an LXC container for lightweight performance adn direct acc
 Docker is deployed inside a separate LXC container. This container hosts the media automation stack, keeping Docker workloads isolated from both Proxmox host and Jellyfin.
 Remote access is handled through Tailscale and WireGuard, avoiding unsage public exposure of internal services.
 
-![alt text](https://github.com/frimpongemanuele/HomeLab/blob/main/media/ProxmoxScreen.png)
+![alt text](https://github.com/frimpongemanuele/HomeLab/blob/main/media/ProxmoxScreen.png?raw=true)
 
 ## Tech Stack
 
