@@ -4,6 +4,8 @@ Secure Home Lab Infrastructure with Proxmox (Home Assistant, Media Server &amp; 
 This repository is intended to document my journey in setting up a HomeLab, with the goal of hosting services and tools.
 It will also be the fist project I'll document fully here on Github.
 
+The goal is to show that even with an old laptop or an old repurposed mini pc, one can learn and experiment a fully functional infostructure. 
+
 It will be touching all service that can come to mind in a standard home server istance and it will document the design and implementation of a self-hosted home lab build around **Proxmox VE**, focused on virtualization, cybersecurity, networking, automation, media services, secure remote access and backup strategy.
 
 My fist lab was setup simply with an older laptop based server which is being replaced by a scalable mini PC infrastructure and an external storage device.
