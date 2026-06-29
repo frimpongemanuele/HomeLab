@@ -39,6 +39,8 @@ My fist lab was setup simply with an older laptop based server which is being re
 
 - Philips Hue Bridge 2.0
 
+![Proxmox](https://img.shields.io/badge/Proxmox-VE-orange)
+
 ## Key Technologies:
 
 -  VE
