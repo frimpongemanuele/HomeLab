@@ -2,27 +2,27 @@
 Secure Home Lab Infrastructure with Proxmox (Home Assistant, Media Server &amp; VPN)
 
 This repository is intended to document my journey in setting up a HomeLab, with the goal of hosting services and tools.
-It will also be the fist project I'll document fully here on Github.
+It will also be the first project I'll document fully here on Github.
 
 The goal is to show that even with an old laptop or an old repurposed mini pc, one can learn and experiment a fully functional infostructure. 
 
-It will be touching all service that can come to mind in a standard home server istance and it will document the design and implementation of a self-hosted home lab build around **Proxmox VE**, focused on virtualization, cybersecurity, networking, automation, media services, secure remote access and backup strategy.
+It will be touching all service that can come to mind in a standard home server instance and it will document the design and implementation of a self-hosted home lab build around **Proxmox VE**, focused on virtualization, cybersecurity, networking, automation, media services, secure remote access and backup strategy.
 
-My fist lab was setup simply with an older laptop based server which is being replaced by a scalable mini PC infrastructure and an external storage device.
+My first lab was setup simply with an older laptop based server which is being replaced by a scalable mini PC infrastructure and an external storage device.
 
 <p> With time, the goal is to experiment and learn about securing it and improving networking and storage. Main goals: </p>
 
-- Build a reliable self-hosted infrastracture;
+- Build a reliable self-hosted infrastructure;
 - Practice virtualization and containerization;
 - Deployment of smart home and media services;
 - Implementation of secure remote access without exposing services publicly;
 - Centralized monitoring through a dashboard;
 - Application of cybersecurity best practices;
-- Creation of a realistic enviroment for learning DevOps, networking and system administration.
+- Creation of a realistic environment for learning DevOps, networking and system administration.
 
 ## Hardware:
 
-- Lenovo ThinkCentre M710q Tiny (Main Proxmox host)
+- Lenovo ThinkCentre M720q Tiny (Main Proxmox host)
   - Intel Core i5-8500T, 6 Cores, 6 Threads, 2.1 GHz, Up to 3.5 GHz, 35W (Coffee Lake)
   - Intel UHD Graphics 630 (Integrated)
   - Proprietary Tiny motherboard (Q370 chipset)
@@ -68,10 +68,10 @@ The Proxmox host acts as the core infrastracture layer. Each major service is is
 
 Home Assistant runs as a dedicated VM because HA OS benefits from a full appliance-style environment and add-on support.
 
-Jellyfin runs inside an LXC container for lightweight performance adn direct access to media storage. Intel GPU passthrough is configured for hardware-accelerated transcoding.
+Jellyfin runs inside an LXC container for lightweight performance and direct access to media storage. Intel GPU passthrough is configured for hardware-accelerated transcoding.
 
 Docker is deployed inside a separate LXC container. This container hosts the media automation stack, keeping Docker workloads isolated from both Proxmox host and Jellyfin.
-Remote access is handled through Tailscale and WireGuard, avoiding unsage public exposure of internal services.
+Remote access is handled through Tailscale and WireGuard, avoiding unsafe public exposure of internal services.
 
 ![alt text](https://github.com/frimpongemanuele/HomeLab/blob/main/media/ProxmoxScreen.png?raw=true)
 
@@ -455,7 +455,7 @@ lxc.apparmor.profile: unconfined
 Lesson:
 Docker inside LXC is possible, but it requires careful configuration and has security trade-offs
 
-# Improvments (In progress...)
+# Improvements (In progress...)
 
 ## security improvements
 
