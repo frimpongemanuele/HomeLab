@@ -37,7 +37,7 @@ My first lab was setup simply with an older laptop based server which is being r
 
 - SONOFF Zigbee 3.0 USB Dongle Plus (20 dBm output gain)
 
-- Philips Hue Bridge 2.0
+- Philips Hue idge 2.0
 
 ## Key Technologies:
 
@@ -84,8 +84,6 @@ Remote access is handled through Tailscale and WireGuard, avoiding unsafe public
 | LXC | Lightwight containers | Efficent isolation for Linux services |
 | Docker | Application deployment | Easy service deployment with Docker Compose |
 | Jellyfin | Media Server | Self-hosted streaming platform |
-
-<br>
 
 | Technology | Purpose | Reason |
 | ------------- | ------------- | ------------- |
@@ -160,11 +158,14 @@ Disabled initially:
 Docker was installed inside LXC 102.
 
 To support nested Docker, the LXC configuration was modified:
-<br> features: nesting=1,keyctl=1
-<br> lxc.apparmor.profile: unconfined
+
+features: nesting=1,keyctl=1
+
+lxc.apparmor.profile: unconfined
 
 For specific Docker containers, AppArmor was disabled:
-<br> security_opt:
+
+security_opt:
   - apparmor=unconfined
 
 This was required because Docker inside LXC can conflict with AppArmor profiles.
