@@ -55,7 +55,7 @@ My first lab was setup simply with an older laptop based server which is being r
   - No public port forwarding
 - [Tailscale VPN / WireGuard]
   - [Home LAN]
-- [ Host]
+- [Host]
   - Home Assistant VM
   - Jellyfin LXC
   - Docker LXC
