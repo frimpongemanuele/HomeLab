@@ -41,7 +41,7 @@ My first lab was setup simply with an older laptop based server which is being r
 
 ## Key Technologies:
 
--  VE
+-  Proxmox VE
 - Home Assistant OS VM
 - Jellyfin LXC
 - Docker LXC
@@ -215,24 +215,24 @@ Inside the container:
 ls /media
 
 Expected result:
-<br> movies
-<br> tv
+ movies
+ tv
 
 # Cybersecurity Focus
 Security was one of the main design goals of this home lab.
 
 Implemented Security Measures:
-<br> Remote Access Without Port Forwarding
-<br> No services are directly exposed to the public internet.
+Remote Access Without Port Forwarding
+No services are directly exposed to the public internet.
 
 Remote access is handled through:
 -	Tailscale
 -	WireGuard
 
 This reduces the attack surface significantly.
-<br>Public Internet
-<br>│
-<br>└── No exposed Jellyfin / Proxmox / Home Assistant ports
+Public Internet
+│
+└── No exposed Jellyfin / Proxmox / Home Assistant ports
 
 ## Service Isolation
 
@@ -247,17 +247,17 @@ This limits the impact of a compromise.
 ## API Tokens Instead of Passwords
 
 Homepage integrates with Proxmox using an API token:
-<br> username: root@username
-<br> password: TOKEN_SECRET
+ username: root@username
+ password: TOKEN_SECRET
 
 Because this is better than storing a full root password.
 
 ## Backup Strategy
 
 Backups are implemented at multiple levels:
-<br> Home Assistant → Google Drive backup
-<br> Proxmox VM/LXC → scheduled Proxmox backups
-<br> Media/configs  → external HDD
+ Home Assistant → Google Drive backup
+ Proxmox VM/LXC → scheduled Proxmox backups
+ Media/configs  → external HDD
 
 ## Snapshot-Based Update Workflow
 
@@ -271,8 +271,8 @@ Before risky updates:
 ## SMB Security
 
 Samba was configured with a real user instead of guest access:
-<br> adduser mediauser
-<br> smbpasswd -a mediauser
+ adduser mediauser
+ smbpasswd -a mediauser
 
 Example share:
 [media]
@@ -414,17 +414,17 @@ For automation stacks, write access must be planned carefully.
 After reboot, Proxmox entered emergency mode because the external HDD mount failed.
 
 Error pattern:
-<br> Timed out waiting for device
+ Timed out waiting for device
 
 Dependency failed for /mnt/media
 Dependency failed for local-fs.target
 
 Solution:
-<br> The strict fstab entry was removed/commented.
+ The strict fstab entry was removed/commented.
 The final mount strategy uses nofail.
 
 Correct approach:
-<br> UUID=XXXX-XXXX /mnt/media exfat defaults,nofail,uid=1000,gid=1000,umask=000 0 0
+ UUID=XXXX-XXXX /mnt/media exfat defaults,nofail,uid=1000,gid=1000,umask=000 0 0
 
 ## 4: Data recovery
 
@@ -436,10 +436,10 @@ Tools tested:
 -	PhotoRec
 
 Result:
-<br> Original folder structure was mostly lost, but many raw media files were recovered.
+ Original folder structure was mostly lost, but many raw media files were recovered.
 
 Lesson:
-<br> Data recovery is possible, but prevention is better.
+ Data recovery is possible, but prevention is better.
 Read-only inspection should always happen before disk modification.
 
 ## 5: Docker inside LXC
@@ -447,10 +447,10 @@ Read-only inspection should always happen before disk modification.
 Docker initially failed because of AppArmor restrictions.
 
 Error:
-<br> AppArmor enabled but docker-default profile could not be loaded
+ AppArmor enabled but docker-default profile could not be loaded
 
 Solution:
-<br> features: nesting=1,keyctl=1
+ features: nesting=1,keyctl=1
 lxc.apparmor.profile: unconfined
 
 Lesson:
