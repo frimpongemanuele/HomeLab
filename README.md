@@ -4,7 +4,7 @@ Secure Home Lab Infrastructure with Proxmox (Home Assistant, Media Server &amp; 
 This repository is intended to document my journey in setting up a HomeLab, with the goal of hosting services and tools.
 It will also be the first project I'll document fully here on Github.
 
-The goal is to show that even with an old laptop or an old repurposed mini pc, one can learn and experiment a fully functional infostructure. 
+The goal is to show that even with an old laptop or an old repurposed mini pc, one can learn and experiment a fully functional infrastructure. 
 
 It will be touching all service that can come to mind in a standard home server instance and it will document the design and implementation of a self-hosted home lab build around **Proxmox VE**, focused on virtualization, cybersecurity, networking, automation, media services, secure remote access and backup strategy.
 
@@ -37,7 +37,7 @@ My first lab was setup simply with an older laptop based server which is being r
 
 - SONOFF Zigbee 3.0 USB Dongle Plus (20 dBm output gain)
 
-- Philips Hue idge 2.0
+- Philips Hue Bridge 2.0
 
 ## Key Technologies:
 
@@ -81,7 +81,7 @@ Remote access is handled through Tailscale and WireGuard, avoiding unsafe public
 | ------------- | ------------- | ------------- |
 | Proxmox VE | Hypervisor | Reliable virtualization platform with VM, LXC, backup and snapshot support |
 | Home Assistant OS | Smart home platform | Centralized automation and IoT control |
-| LXC | Lightwight containers | Efficent isolation for Linux services |
+| LXC | Lightweight containers | Efficient isolation for Linux services |
 | Docker | Application deployment | Easy service deployment with Docker Compose |
 | Jellyfin | Media Server | Self-hosted streaming platform |
 
@@ -384,7 +384,7 @@ Lessons learned:
 
 # Challenge & Lessons Learned
 
-## 1: Jeelyfin was not reachable locally
+## 1: Jellyfin was not reachable locally
 
 Jellyfin worked through VPN but not from the local PC.
 
