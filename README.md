@@ -549,6 +549,49 @@ For recruiters:
 -	Think in terms of risk and resilience
 -	Build systems that are usable, secure and maintainable
 
+## Visualization & Tools Suggestions
+
+Recommended Diagrams
+1. Network topology
+2. Proxmox VM/LXC layout
+3. Media automation pipeline
+4. Backup flow
+5. Remote access model
+6. Future VLAN segmentation
+
+Dashboard Screenshots to Include
+
+•	Proxmox VM/LXC overview
+•	Homepage dashboard
+•	Jellyfin libraries
+•	Jellyfin hardware acceleration settings
+•	Docker Compose services running
+•	Tailscale admin view
+•	Proxmox backup job
+•	Home Assistant dashboard
+•	Samba share from Windows
+•	Media folder structure
+
+Logs and Metrics to Include
+
+pct list
+docker ps
+lsblk -f
+df -h
+systemctl status smbd
+vainfo
+
+
+Example command block for README:
+docker compose ps
+
+Example output:
+NAME          STATUS
+radarr        running
+sonarr        running
+prowlarr      running
+bazarr        running
+qbittorrent   running
 
 
 # Sections
@@ -565,6 +608,93 @@ For recruiters:
 ## Future improvments
 ## Screenshots
 ## Repository Structure
+
+
+To do:
+
+
+
+Badges
+![Proxmox](https://img.shields.io/badge/Proxmox-VE-orange)
+![Docker](https://img.shields.io/badge/Docker-Compose-blue)
+![Linux](https://img.shields.io/badge/Linux-Server-black)
+![Security](https://img.shields.io/badge/Security-Hardened-green)
+![Self Hosted](https://img.shields.io/badge/Self--Hosted-Homelab-purple)
+Suggested README Sections
+1. Project Overview
+2. Architecture
+3. Network Topology
+4. Tech Stack
+5. Deployment
+6. Cybersecurity Design
+7. Backup Strategy
+8. Monitoring Dashboard
+9. Challenges & Lessons Learned
+10. Future Improvements
+11. Screenshots
+12. Repository Structure
+
+Good GitHub Additions
+•	Add sanitized config examples
+•	Never upload real tokens or passwords
+•	Use .env.example
+•	Add screenshots
+•	Add architecture diagrams
+•	Add a changelog
+•	Add a “Lessons Learned” section
+•	Add “Security Considerations” prominently
+
+
+
+structure:
+homelab-proxmox/
+│
+├── README.md
+│
+├── docs/
+│   ├── architecture.md
+│   ├── cybersecurity.md
+│   ├── backup-strategy.md
+│   ├── disaster-recovery.md
+│   ├── jellyfin.md
+│   ├── home-assistant.md
+│   ├── docker-stack.md
+│   └── lessons-learned.md
+│
+├── diagrams/
+│   ├── network-topology.drawio
+│   ├── proxmox-architecture.png
+│   ├── media-pipeline.png
+│   └── backup-flow.png
+│
+├── configs/
+│   ├── proxmox/
+│   │   ├── lxc-101-jellyfin.conf.example
+│   │   ├── lxc-102-docker.conf.example
+│   │   └── fstab.example
+│   │
+│   ├── docker/
+│   │   ├── docker-compose.example.yml
+│   │   └── .env.example
+│   │
+│   ├── samba/
+│   │   └── smb.conf.example
+│   │
+│   └── homepage/
+│       ├── settings.yaml.example
+│       ├── services.yaml.example
+│       └── widgets.yaml.example
+│
+├── scripts/
+│   ├── proxmox-snapshot-before-update.sh
+│   ├── backup-configs.sh
+│   └── check-media-mount.sh
+│
+└── screenshots/
+    ├── proxmox-dashboard.png
+    ├── homepage-dashboard.png
+    ├── jellyfin-ui.png
+    └── backup-job.png
 
 
 
