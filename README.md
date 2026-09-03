@@ -645,8 +645,10 @@ Good GitHub Additions
 •	Add “Security Considerations” prominently
 
 
+### Structure
 
-structure:
+```text
+
 homelab-proxmox/
 │
 ├── README.md
@@ -696,7 +698,4 @@ homelab-proxmox/
     ├── jellyfin-ui.png
     └── backup-job.png
 
-
-
-
-
+```
