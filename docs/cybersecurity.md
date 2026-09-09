@@ -939,3 +939,5 @@ The environment is not presented as fully hardened or enterprise-grade.
 Instead, it serves as an evolving platform where security controls can be designed, implemented, tested, monitored, and improved over time.
 
 The next major milestone is **network segmentation and security monitoring**, which will introduce stronger trust boundaries and provide the telemetry required for more advanced defensive-security experimentation.
+
+-- monitoring
