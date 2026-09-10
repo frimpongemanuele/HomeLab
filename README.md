@@ -1,6 +1,6 @@
 # HomeLab
 
-> A self-hosted infrastructure project built around Proxmox VE, combining virtualization, smart-home automation, media services, secure remote access, monitoring, cybersecurity, backup, and a dedicated lab environment.
+> A self-hosted infrastructure project built around Proxmox VE, combining virtualization, smart-home automation, media services, secure remote access, monitoring, cybersecurity, backup and a dedicated lab environment.
 
 ![HomeLab Architecture](diagrams/exported/homelab-architecture.svg)
 
