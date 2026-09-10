@@ -248,6 +248,8 @@ Monitoring is implemented as multiple complementary layers rather than relying o
 
 ![Monitoring Architecture](diagrams/exported/monitoring-architecture.svg)
 
+![Grafana Dashboard](media/screenshots/grafana-dashboard.png)
+
 | Tool | Purpose |
 |---|---|
 | Prometheus | Time-series metrics |
@@ -288,6 +290,8 @@ More details:
 # Dashboard
 
 **Homepage** acts as the central operational entry point for the HomeLab.
+
+![Homepage Dashboard](media/screenshots/homepage-dashboard.png)
 
 The dashboard groups services into areas such as:
 
