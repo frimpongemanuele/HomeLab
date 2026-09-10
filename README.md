@@ -1,701 +1,686 @@
 # HomeLab
-Secure Home Lab Infrastructure with Proxmox (Home Assistant, Media Server &amp; VPN)
 
-This repository is intended to document my journey in setting up a HomeLab, with the goal of hosting services and tools.
-It will also be the first project I'll document fully here on Github.
+> A self-hosted infrastructure project built around Proxmox VE, combining virtualization, smart-home automation, media services, secure remote access, monitoring, cybersecurity, backup, and a dedicated lab environment.
 
-The goal is to show that even with an old laptop or an old repurposed mini pc, one can learn and experiment a fully functional infrastructure. 
+![HomeLab Architecture](diagrams/exported/homelab-architecture.svg)
 
-It will be touching all service that can come to mind in a standard home server instance and it will document the design and implementation of a self-hosted home lab build around **Proxmox VE**, focused on virtualization, cybersecurity, networking, automation, media services, secure remote access and backup strategy.
+---
 
-My first lab was setup simply with an older laptop based server which is being replaced by a scalable mini PC infrastructure and an external storage device.
+## Overview
 
-<p> With time, the goal is to experiment and learn about securing it and improving networking and storage. Main goals: </p>
+This repository documents the design, deployment, operation, and continuous improvement of my personal HomeLab.
 
-- Build a reliable self-hosted infrastructure;
-- Practice virtualization and containerization;
-- Deployment of smart home and media services;
-- Implementation of secure remote access without exposing services publicly;
-- Centralized monitoring through a dashboard;
-- Application of cybersecurity best practices;
-- Creation of a realistic environment for learning DevOps, networking and system administration.
+The environment started as a small self-hosted server and evolved into a structured infrastructure platform used to practice:
 
-## Hardware:
+- Virtualization
+- Linux administration
+- Containerization
+- Networking
+- Cybersecurity
+- Smart-home automation
+- Media services
+- Monitoring and observability
+- Backup and disaster recovery
+- Infrastructure troubleshooting
+- Application and security testing
 
-- Lenovo ThinkCentre M720q Tiny (Main Proxmox host)
-  - Intel Core i5-8500T, 6 Cores, 6 Threads, 2.1 GHz, Up to 3.5 GHz, 35W (Coffee Lake)
-  - Intel UHD Graphics 630 (Integrated)
-  - Proprietary Tiny motherboard (Q370 chipset)
-  - 16 GB DDR4 SO-DIMM
-  - 256 GB NVMe SSD
-
-- External 3TB HDD, Seagate ST3000DM001 (3TB 3.5" SATA HDD)
-
-- ICY BOX IB-377U3 (External 3.5" HDD SATA enclosure), USB 3.0, SATA III up to 6 Gbit/s, UASP support, external 12V power supply
-
-- TIM HUB+ Router (Main home router), Wi-Fi 6, dual-band 2.4 GHz/5 GHz, Gigabit Ethernet, EasyMesh support
-
-- SONOFF Zigbee 3.0 USB Dongle Plus (20 dBm output gain)
-
-- Philips Hue Bridge 2.0
-
-## Key Technologies:
-
--  Proxmox VE
-- Home Assistant OS VM
-- Jellyfin LXC
-- Docker LXC
-- Tailscale LXC
-- Homepage Dashboard
-- Monitoring and Security workloads
-
-## Network Topology:
-
-- [Internet]
-  - No public port forwarding
-- [Tailscale VPN / WireGuard]
-  - [Home LAN]
-- [Host]
-  - Home Assistant VM
-  - Jellyfin LXC
-  - Docker LXC
-  - Tailscale LXC
-  - Homepage Dashboard
-  - Security
-
-## Architecture Explanation
-The Proxmox host acts as the core infrastracture layer. Each major service is isolated either in a VM or LXC container.
-
-Home Assistant runs as a dedicated VM because HA OS benefits from a full appliance-style environment and add-on support.
-
-Jellyfin runs inside an LXC container for lightweight performance and direct access to media storage. Intel GPU passthrough is configured for hardware-accelerated transcoding.
-
-Docker is deployed inside a separate LXC container. This container hosts the media automation stack, keeping Docker workloads isolated from both Proxmox host and Jellyfin.
-Remote access is handled through Tailscale and WireGuard, avoiding unsafe public exposure of internal services.
+The objective is not simply to host applications.
 
-![alt text](https://github.com/frimpongemanuele/HomeLab/blob/main/media/ProxmoxScreen.png?raw=true)
+The project is designed as a practical learning environment where infrastructure can be **built, broken, monitored, recovered, secured, and improved**.
 
-## Tech Stack
-
-| Technology | Purpose | Reason |
-| ------------- | ------------- | ------------- |
-| Proxmox VE | Hypervisor | Reliable virtualization platform with VM, LXC, backup and snapshot support |
-| Home Assistant OS | Smart home platform | Centralized automation and IoT control |
-| LXC | Lightweight containers | Efficient isolation for Linux services |
-| Docker | Application deployment | Easy service deployment with Docker Compose |
-| Jellyfin | Media Server | Self-hosted streaming platform |
-
-| Technology | Purpose | Reason |
-| ------------- | ------------- | ------------- |
-| Radarr | Movie automation	| Manages movie library |
-| Sonarr	| TV automation	| Manages TV show library |
-| Prowlarr	| Indexer manager	| Centralized indexer configuration |
-| Bazarr	| Subtitle automation	| Automatic subtitle management |
-| Tailscale	| Secure remote access	| Zero-trust VPN without port forwarding |
-| WireGuard	| VPN access	| Secure remote access to the home network |
-| Samba	| File sharing	| Allows Windows clients to access media storage |
-| Homepage	| Dashboard	| Centralized monitoring and service access |
-| exFAT	| Portable HDD filesystem	| Compatible with Linux, Windows and macOS |
+---
 
-## Setup & Deployment
-- Proxmox Installation
-Proxmox VE was installed on a Lenovo mini PC used as the main virtualization layer.
-
-Main storage:
-NVMe SSD → Proxmox system storage
-External 3TB HDD → media and backup storage
+# Infrastructure at a Glance
 
-### Home Assistant VM
-Home Assistant OS was deployed as a VM.
+## Hardware
 
-Key points:
-•	Restored from an existing backup
-•	Used for smart home automation
-•	WireGuard configured for remote access
-•	Google Drive backup configured for off-site backup
+| Component | Specification |
+|---|---|
+| Main Host | Lenovo ThinkCentre M720q Tiny |
+| CPU | Intel Core i5-8500T — 6 cores / 6 threads |
+| Integrated GPU | Intel UHD Graphics 630 |
+| RAM | 16 GB DDR4 |
+| System Storage | 256 GB NVMe SSD |
+| Media / Backup Storage | 3 TB Seagate HDD |
+| HDD Enclosure | ICY BOX IB-377U3 USB 3.0 |
+| Main Router | TIM HUB+ |
+| Zigbee Coordinator | SONOFF Zigbee 3.0 USB Dongle Plus |
+| Smart Home Bridge | Philips Hue Bridge 2.0 |
 
-### Jellyfin LXC
-Jellyfin was installed in an LXC container.
+---
 
-Container details:
-Container ID: 101
-Hostname: jellyfin
-IP address: 192.168.XXX.XXX
-Port: 8096
-Jellyfin libraries:
-Movies → /movies
-TV     → /tv
+# Virtualization
 
-- Intel GPU Passthrough for Jellyfin
-The Proxmox host exposed Intel GPU devices:
-/dev/dri/card0
-/dev/dri/renderD128
+The Lenovo ThinkCentre runs **Proxmox VE** as the main virtualization layer.
 
-The Jellyfin user was added to the required groups:
-usermod -aG video jellyfin
-usermod -aG render jellyfin
-VAAPI was enabled in Jellyfin:
-Hardware acceleration: VAAPI
-VAAPI device: /dev/dri/renderD128
-Hardware encoding: Enabled
-Tone mapping: Disabled initially
+Major workloads are deliberately separated based on their requirements.
 
-Recommended decoding options:
-Enabled:
-- H264
-- HEVC
-- HEVC 10-bit
-- VP9
-- VP9 10-bit
+| ID | Workload | Type | Purpose |
+|---:|---|---|---|
+| 100 | Home Assistant OS | VM | Smart-home automation |
+| 101 | Jellyfin | LXC | Media streaming |
+| 102 | Docker | LXC | Containerized application platform |
+| 103 | Tailscale | LXC | Secure remote access |
+| 104 | Homepage | LXC | Central service dashboard |
+| 105 | Pi-hole | LXC | DNS filtering |
+| 106 | WebApp | LXC | Development and security lab |
 
-Disabled initially:
-- AV1
-- Low-power H264 encoder
-- Low-power HEVC encoder
-- Tone mapping
+This design allows services to have independent:
 
-### Docker LXC
-Docker was installed inside LXC 102.
+- Resources
+- Update cycles
+- Recovery procedures
+- Security boundaries
+- Storage access
+- Failure domains
 
-To support nested Docker, the LXC configuration was modified:
+---
 
-features: nesting=1,keyctl=1
+# Service Stack
 
-lxc.apparmor.profile: unconfined
+## Smart Home
 
-For specific Docker containers, AppArmor was disabled:
+**Home Assistant OS** runs as a dedicated VM and provides:
 
-security_opt:
-  - apparmor=unconfined
+- Smart-device integration
+- Zigbee
+- Automations
+- Presence detection
+- ESP32 Bluetooth proxies
+- Bermuda room-level presence
+- Interactive 3D floor-plan dashboard
+- Google Drive backups
 
-This was required because Docker inside LXC can conflict with AppArmor profiles.
+![Home Assistant Architecture](diagrams/exported/home-assistant-architecture.svg)
 
-## Media Automation Stack
+---
 
-The following services were deployed with Docker Compose:
-qBittorrent
-Radarr
-Sonarr
-Prowlarr
-Bazarr
+## Media Server
 
-Media pipeline:
-Prowlarr → Sonarr/Radarr → qBittorrent → Downloads → Media Library → Jellyfin
+**Jellyfin** runs inside a dedicated LXC container.
 
-Path consistency was critical:
-/media/movies
-/media/tv
+The deployment includes:
 
-All containers were configured to use consistent media paths to avoid import errors.
+- External shared media storage
+- Intel GPU passthrough
+- VA-API hardware acceleration
+- H.264 / HEVC / VP9 hardware decoding
+- VPN-based remote access
+- Separate application and media storage
 
-## External HDD Mount
-The final storage design uses exFAT for portability.
+![Jellyfin Architecture](diagrams/exported/jellyfin-architecture.svg)
 
-Example mount workflow:
-apt update
-apt install -y exfatprogs
-
-mkdir -p /mnt/media
-lsblk -f
-blkid
-
-Safe /etc/fstab entry:
-UUID=XXXX-XXXX /mnt/media exfat defaults,nofail,uid=1000,gid=1000,umask=000 0 0
-
-The nofail option is important because it prevents Proxmox from entering emergency mode if the external disk is disconnected during boot.
-
-## Bind Mount to Jellyfin
-
-The media drive is bind-mounted into the Jellyfin container:
-pct set 101 -protection 0
-pct set 101 -mp0 /mnt/media,mp=/media
-pct set 101 -protection 1
-
-Inside the container:
-ls /media
-
-Expected result:
- movies
- tv
-
-# Cybersecurity Focus
-Security was one of the main design goals of this home lab.
-
-Implemented Security Measures:
-Remote Access Without Port Forwarding
-No services are directly exposed to the public internet.
-
-Remote access is handled through:
--	Tailscale
--	WireGuard
-
-This reduces the attack surface significantly.
-Public Internet
-│
-└── No exposed Jellyfin / Proxmox / Home Assistant ports
-
-## Service Isolation
-
-Services are separated by workload:
-Home Assistant    → VM
-Jellyfin          → LXC
-Docker stack      → Dedicated LXC
-Tailscale         → Dedicated LXC
-Dashboard         → Dedicated LXC
-This limits the impact of a compromise.
-
-## API Tokens Instead of Passwords
-
-Homepage integrates with Proxmox using an API token:
- username: root@username
- password: TOKEN_SECRET
-
-Because this is better than storing a full root password.
-
-## Backup Strategy
-
-Backups are implemented at multiple levels:
- Home Assistant → Google Drive backup
- Proxmox VM/LXC → scheduled Proxmox backups
- Media/configs  → external HDD
-
-## Snapshot-Based Update Workflow
-
-Before risky updates:
-1. Create snapshot
-2. Apply update
-3. Test service
-4. If successful → delete snapshot
-5. If broken → rollback
-
-## SMB Security
-
-Samba was configured with a real user instead of guest access:
- adduser mediauser
- smbpasswd -a mediauser
-
-Example share:
-[media]
-path = /mnt/media
-browseable = yes
-writable = yes
-valid users = mediauser
-force user = mediauser
-force group = mediauser
-create mask = 0777
-directory mask = 0777
-
-SMB1 was identified as insecure and should remain disabled.
-
-## Threat Model
-
-This lab simulates and mitigates several realistic risks:
-
-| Risk | Mitigation |
-| ------------- | ------------- |
-|Public service exposure |	No port forwarding, VPN-only access |
-|Weak remote access |	Tailscale/WireGuard |
-|Misconfigured services	| Service isolation |
-|Broken updates	| Snapshots and rollback |
-|Data loss	Multi-layer | backup strategy |
-|Credential leakage	| API tokens instead of passwords |
-|Container escape risk	| Service separation and limited scope |
-|Storage failure	| External backup strategy |
-
-## Possible Attack Surfaces
-
-- Proxmox web interface
--	Home Assistant web UI
--	Jellyfin web UI
--	Docker containers
--	qBittorrent web interface
--	SMB share
--	API tokens
--	VPN endpoints
--	Misconfigured reverse proxy in the future
-
-## Defensive Strategies Applied
-
--	Keep management interfaces private
--	Avoid exposing services directly to the internet
--	Use VPN for remote access
--	Use snapshots before updates
--	Use dedicated containers for different workloads
--	Use API tokens with limited scope where possible
--	Disable legacy protocols such as SMB1
--	Maintain backup copies of critical configurations
-
-
-# Use Cases & What I Practiced
-
-## Virtualization
-
-- Installed and configured Proxmox VE
-- Created and managed VMs and LXC containers
-- Used snapshots and backup jobs
-- Managed external storage mounts
-
-## Containerization
-
--	Configured Docker inside LXC
--	Solved AppArmor and nesting issues
--	Deployed services with Docker Compose
--	Managed persistent volumes and container paths
-
-## Networking
-
--	Assigned static LAN IPs
--	Troubleshot IP conflicts
--	Configured local DNS concepts such as:
-	- frimflix.local
-  - frimflix.home
--	Used VPN-based remote access
--	Avoided public port forwarding
-
-## Cybersecurity
-
--	Designed a low-exposure remote access model
--	Used VPN instead of open ports
--	Managed API tokens
--	Disabled insecure legacy SMB behavior
--	Practiced backup and recovery workflows
+---
 
 ## Media Automation
 
--	Configured Jellyfin
--	Connected *arr-stack (media manager)
--	Designed media paths for automated imports
--	Tuned hardware transcoding
+The Docker LXC hosts the automated media-management stack.
 
-## Incident Recovery
+Core services include:
 
-A major real-world incident occurred during storage migration.
+| Service | Role |
+|---|---|
+| Jellyseerr | Media requests |
+| Sonarr | TV automation |
+| Radarr | Movie automation |
+| Prowlarr | Indexer management |
+| qBittorrent | Download client |
+| Bazarr | Subtitle automation |
+| Dispatcharr | IPTV / live TV management |
 
-The external 3TB HDD was accidentally modified during partitioning and formatting attempts. Recovery tools such as TestDisk, R-Studio and PhotoRec were used to recover media files.
+![Media Automation Pipeline](diagrams/exported/media-pipeline.svg)
 
-Lessons learned:
+---
 
-- Always identify disks before formatting
--	Use read-only mounting first
--	Never run destructive commands on disks containing data
--	Keep raw recovery output untouched
--	Validate backups before modifying storage
+# Docker Infrastructure
 
+Docker runs inside a dedicated Proxmox LXC.
 
-# Challenge & Lessons Learned
+Additional services include:
 
-## 1: Jellyfin was not reachable locally
+### Networking
 
-Jellyfin worked through VPN but not from the local PC.
+- Nginx Proxy Manager
+- Speedtest Tracker
 
-Root cause:
-Old laptop/server was still running and causing a conflict
+### Monitoring
 
-Solution:
-The old server was fully shut down and the new Jellyfin intance restored.
+- Prometheus
+- Grafana
+- Uptime Kuma
+- Netdata
+- Glances
 
-## 2: LXC bind mount permissions
+### Maintenance
 
-Because Jellyfin runs inside an unprivileged LXC, permissions on bind-mounted storage behaved differently.
+- What's Up Docker
 
-Example issue:
-chown -R 1000:1000 /media
-
-Result:
-Operation not permitted
-
-Lesson:
-Unprivileged containers require careful UID/GID mapping.
-For read-only media consumption, read access is enough.
-For automation stacks, write access must be planned carefully.
-
-## 3: Proxmox boot failure due to fstab
-
-After reboot, Proxmox entered emergency mode because the external HDD mount failed.
-
-Error pattern:
- Timed out waiting for device
-
-Dependency failed for /mnt/media
-Dependency failed for local-fs.target
-
-Solution:
- The strict fstab entry was removed/commented.
-The final mount strategy uses nofail.
-
-Correct approach:
- UUID=XXXX-XXXX /mnt/media exfat defaults,nofail,uid=1000,gid=1000,umask=000 0 0
-
-## 4: Data recovery
-
-The 3TB HDD filesystem metadata was damaged.
-
-Tools tested:
--	TestDisk
--	R-Studio
--	PhotoRec
-
-Result:
- Original folder structure was mostly lost, but many raw media files were recovered.
-
-Lesson:
- Data recovery is possible, but prevention is better.
-Read-only inspection should always happen before disk modification.
-
-## 5: Docker inside LXC
-
-Docker initially failed because of AppArmor restrictions.
-
-Error:
- AppArmor enabled but docker-default profile could not be loaded
-
-Solution:
- features: nesting=1,keyctl=1
-lxc.apparmor.profile: unconfined
-
-Lesson:
-Docker inside LXC is possible, but it requires careful configuration and has security trade-offs
-
-# Improvements (In progress...)
-
-## security improvements
-
-- Complete VLAN segmentation:
-  -	Management VLAN
-  -	IoT VLAN
-  -	Media VLAN
-  -	Guest VLAN
--	Add firewall rules between VLANs
--	Restrict Proxmox access only to trusted admin devices
--	Use a reverse proxy only through VPN or with strong authentication
--	Add intrusion detection with Wazuh or Suricata
--	Centralize logs with Loki, Graylog or ELK
--	Add fail2ban where applicable
-
-## VPN improvements
-
-Future torrent traffic should be isolated through Gluetun:
-
-qBittorrent → Gluetun VPN → Internet
-
-Important design rule:
-Only download traffic should use the privacy VPN.
-
-Home Assistant and Jellyfin should not be routed through the torrent VPN.
-
-## Monitoring improvements (Deployed)
-
--	Grafana dashboards
--	Prometheus metrics
--	Proxmox exporter
--	Uptime Kuma
--	Jellyfin usage metrics
--	Home Assistant system metrics
-
-## Backup improvements
-
--	Separate backup disk from media disk
--	Add off-site encrypted backups
--	Automate config exports
--	Version-control Docker Compose files
--	Add restore testing schedule
-
-## Automation improvements
-
--	Ansible playbooks for repeatable deployment
--	GitHub repository for infrastructure configs
--	Automated container updates with manual approval
--	Secrets management with SOPS or Ansible Vault
-
-
-# Portfolio Angle
-
-The goal of this project is to demonstrates practical skills relevant to cybersecurity, DevOps and systems administration.
-
-## Skills used:
-
--	Linux system administration
--	Proxmox virtualization
--	LXC container management
--	Docker and Docker Compose
--	Network troubleshooting
--	VPN-based secure access
--	Storage management
--	Backup planning
--	Incident recovery
--	Media automation
--	API token usage
--	Service hardening
--	Dashboard and monitoring setup
-
-## Why This Project Matters
-
-This is not just my home server/lab. It is a realistic self-hosted infrastructure project that includes:
-
--	Segmented workloads
--	Secure remote access
--	Backup strategy
--	Monitoring dashboard
--	Automation stack
--	Real troubleshooting history
--	Real incident recovery
--	Practical cybersecurity decisions
-
-For recruiters:
-
--	Design infrastructure
--	Document technical decisions
--	Troubleshoot complex problems
--	Think in terms of risk and resilience
--	Build systems that are usable, secure and maintainable
-
-## Visualization & Tools Suggestions
-
-Recommended Diagrams
-1. Network topology
-2. Proxmox VM/LXC layout
-3. Media automation pipeline
-4. Backup flow
-5. Remote access model
-6. Future VLAN segmentation
-
-Dashboard Screenshots to Include
-
-•	Proxmox VM/LXC overview
-•	Homepage dashboard
-•	Jellyfin libraries
-•	Jellyfin hardware acceleration settings
-•	Docker Compose services running
-•	Tailscale admin view
-•	Proxmox backup job
-•	Home Assistant dashboard
-•	Samba share from Windows
-•	Media folder structure
-
-Logs and Metrics to Include
-
-pct list
-docker ps
-lsblk -f
-df -h
-systemctl status smbd
-vainfo
-
-
-Example command block for README:
-docker compose ps
-
-Example output:
-NAME          STATUS
-radarr        running
-sonarr        running
-prowlarr      running
-bazarr        running
-qbittorrent   running
-
-
-# Sections
-
-## Project Overview
-## Architecture
-## Network Topology
-## Tech Stack
-## Deployment
-## Cybersecurity Desgin
-## Backup Strategy
-## Monitoring Dashboard
-## Challenges & Lessons Learned
-## Future improvments
-## Screenshots
-## Repository Structure
-
-
-To do:
-
-
-
-Badges
-![Proxmox](https://img.shields.io/badge/Proxmox-VE-orange)
-![Docker](https://img.shields.io/badge/Docker-Compose-blue)
-![Linux](https://img.shields.io/badge/Linux-Server-black)
-![Security](https://img.shields.io/badge/Security-Hardened-green)
-![Self Hosted](https://img.shields.io/badge/Self--Hosted-Homelab-purple)
-Suggested README Sections
-1. Project Overview
-2. Architecture
-3. Network Topology
-4. Tech Stack
-5. Deployment
-6. Cybersecurity Design
-7. Backup Strategy
-8. Monitoring Dashboard
-9. Challenges & Lessons Learned
-10. Future Improvements
-11. Screenshots
-12. Repository Structure
-
-Good GitHub Additions
-•	Add sanitized config examples
-•	Never upload real tokens or passwords
-•	Use .env.example
-•	Add screenshots
-•	Add architecture diagrams
-•	Add a changelog
-•	Add a “Lessons Learned” section
-•	Add “Security Considerations” prominently
-
-
-### Structure
+Running Docker inside LXC required nested-container support:
 
 ```text
+features: nesting=1,keyctl=1
+lxc.apparmor.profile: unconfined
+```
 
-homelab-proxmox/
+This configuration works well for the current environment, but the reduced AppArmor confinement is documented as a deliberate security trade-off.
+
+More details:
+
+[Docker & Media Stack](docs/docker-media-stack.md)
+
+---
+
+# Networking
+
+The current HomeLab primarily operates on:
+
+```text
+192.168.1.0/24
+```
+
+Internet-facing administrative ports are intentionally avoided.
+
+Remote access is provided using:
+
+- **Tailscale**
+- **WireGuard**
+
+The current network remains primarily flat, while VLAN-based segmentation is planned.
+
+![HomeLab Network Architecture](diagrams/exported/network-architecture.svg)
+
+The target security zones are:
+
+```text
+Management
+Services
+IoT
+Lab
+Guest
+```
+
+with inter-VLAN firewall rules controlling communication between them.
+
+More details:
+
+[Networking](docs/networking.md)
+
+---
+
+# Cybersecurity
+
+Security is treated as an architectural requirement rather than an additional application.
+
+Current controls include:
+
+- VPN-based remote administration
+- No intentional public exposure of management interfaces
+- VM / LXC workload separation
+- Unprivileged containers where appropriate
+- API-token authentication
+- Authenticated Samba access
+- SMB1 disabled
+- Pi-hole DNS filtering
+- Private administration interfaces
+- Backup and snapshot procedures
+- Secrets excluded from public configuration
+- Dedicated experimental lab workload
+
+![Security Architecture](diagrams/exported/security-architecture.svg)
+
+The current environment intentionally documents its limitations.
+
+Most importantly:
+
+> Virtualization isolation does not replace network segmentation.
+
+The current flat LAN therefore remains one of the major areas planned for improvement.
+
+More details:
+
+[Cybersecurity Design](docs/cybersecurity.md)
+
+---
+
+# Monitoring & Observability
+
+Monitoring is implemented as multiple complementary layers rather than relying on a single tool.
+
+![Monitoring Architecture](diagrams/exported/monitoring-architecture.svg)
+
+| Tool | Purpose |
+|---|---|
+| Prometheus | Time-series metrics |
+| Grafana | Dashboards and historical analysis |
+| Uptime Kuma | Availability monitoring |
+| Netdata | Detailed real-time telemetry |
+| Glances | Lightweight host monitoring |
+| What's Up Docker | Container update visibility |
+| Speedtest Tracker | WAN performance history |
+| Homepage | Central operational dashboard |
+
+This allows different questions to be answered independently:
+
+```text
+Is the service available?
+        ↓
+Uptime Kuma
+
+Why is the host slow?
+        ↓
+Netdata / Glances
+
+What changed over time?
+        ↓
+Prometheus + Grafana
+
+Are containers outdated?
+        ↓
+What's Up Docker
+```
+
+More details:
+
+[Monitoring & Observability](docs/monitoring.md)
+
+---
+
+# Dashboard
+
+**Homepage** acts as the central operational entry point for the HomeLab.
+
+The dashboard groups services into areas such as:
+
+```text
+Smart Home
+Media
+Infrastructure
+Downloads
+Network
+Monitoring
+Maintenance
+```
+
+It provides quick access to the environment while monitoring platforms remain responsible for detailed telemetry.
+
+---
+
+# Storage
+
+The HomeLab currently uses a 3 TB external HDD mounted on the Proxmox host at:
+
+```text
+/mnt/media
+```
+
+The storage contains:
+
+```text
+/mnt/media
+├── movies
+├── tv
+└── proxmox-backups
+```
+
+The disk is also exposed to Windows clients through Samba.
+
+Jellyfin receives access through an LXC bind mount.
+
+```text
+External HDD
+      │
+      ▼
+Proxmox
+/mnt/media
+      │
+      ├── Jellyfin LXC
+      ├── Docker Media Stack
+      └── Samba
+```
+
+The current use of the same physical disk for media and infrastructure backups is a known resilience limitation.
+
+---
+
+# Backup & Recovery
+
+The environment uses multiple recovery mechanisms:
+
+- Proxmox snapshots
+- Proxmox VM/LXC backups
+- Home Assistant application backups
+- Home Assistant Google Drive backups
+- Version-controlled configuration
+- Documented recovery procedures
+
+![Backup Architecture](diagrams/exported/backup-architecture.svg)
+
+A major storage incident during the project resulted in practical experience with:
+
+- TestDisk
+- R-Studio
+- PhotoRec
+- Filesystem investigation
+- Raw file carving
+- Media-library reconstruction
+- `/etc/fstab` recovery
+- Safe external-storage mounting
+
+One of the main lessons from the incident was:
+
+> A backup must not share every failure domain with the data it protects.
+
+More details:
+
+[Backup & Recovery](docs/backup-recovery.md)
+
+---
+
+# Lab Environment
+
+A dedicated unprivileged LXC is used for:
+
+- Web application development
+- API testing
+- Linux experimentation
+- Deployment testing
+- Reverse-proxy testing
+- Security experiments
+- Application-security learning
+
+![Lab Environment Architecture](diagrams/exported/lab-architecture.svg)
+
+The current WebApp environment still shares the main LAN.
+
+The target architecture moves lab workloads into a dedicated VLAN with restricted access to trusted infrastructure.
+
+This distinction is deliberately documented:
+
+```text
+Compute Isolation
+       ≠
+Network Isolation
+```
+
+More details:
+
+[Lab Environment](docs/lab-environment.md)
+
+---
+
+# Repository Structure
+
+```text
+HomeLab/
 │
 ├── README.md
 │
 ├── docs/
 │   ├── architecture.md
+│   ├── networking.md
+│   ├── monitoring.md
 │   ├── cybersecurity.md
-│   ├── backup-strategy.md
-│   ├── disaster-recovery.md
-│   ├── jellyfin.md
+│   ├── backup-recovery.md
+│   ├── docker-media-stack.md
 │   ├── home-assistant.md
-│   ├── docker-stack.md
+│   ├── jellyfin.md
+│   ├── lab-environment.md
 │   └── lessons-learned.md
 │
 ├── diagrams/
-│   ├── network-topology.drawio
-│   ├── proxmox-architecture.png
-│   ├── media-pipeline.png
-│   └── backup-flow.png
-│
-├── configs/
-│   ├── proxmox/
-│   │   ├── lxc-101-jellyfin.conf.example
-│   │   ├── lxc-102-docker.conf.example
-│   │   └── fstab.example
+│   ├── source/
+│   │   └── *.drawio
 │   │
-│   ├── docker/
-│   │   ├── docker-compose.example.yml
-│   │   └── .env.example
-│   │
-│   ├── samba/
-│   │   └── smb.conf.example
-│   │
-│   └── homepage/
-│       ├── settings.yaml.example
-│       ├── services.yaml.example
-│       └── widgets.yaml.example
+│   └── exported/
+│       └── *.svg
 │
-├── scripts/
-│   ├── proxmox-snapshot-before-update.sh
-│   ├── backup-configs.sh
-│   └── check-media-mount.sh
-│
-└── screenshots/
-    ├── proxmox-dashboard.png
-    ├── homepage-dashboard.png
-    ├── jellyfin-ui.png
-    └── backup-job.png
-
+└── media/
+    └── screenshots/
 ```
+
+---
+
+# Documentation
+
+Detailed technical documentation is separated by topic.
+
+| Documentation | Description |
+|---|---|
+| [Architecture](docs/architecture.md) | Overall infrastructure and virtualization design |
+| [Networking](docs/networking.md) | LAN, DNS, VPN, reverse proxy, and segmentation |
+| [Monitoring](docs/monitoring.md) | Prometheus, Grafana, Uptime Kuma, Netdata, and observability |
+| [Cybersecurity](docs/cybersecurity.md) | Threat model, trust boundaries, security controls, and roadmap |
+| [Backup & Recovery](docs/backup-recovery.md) | Snapshots, backups, storage incidents, and disaster recovery |
+| [Docker & Media Stack](docs/docker-media-stack.md) | Docker architecture and media automation |
+| [Home Assistant](docs/home-assistant.md) | Smart-home platform, Zigbee, presence, and 3D dashboard |
+| [Jellyfin](docs/jellyfin.md) | Media server, storage, GPU passthrough, and transcoding |
+| [Lab Environment](docs/lab-environment.md) | Development and security-testing environment |
+| [Lessons Learned](docs/lessons-learned.md) | Engineering decisions, incidents, and lessons from operating the lab |
+
+---
+
+# Architecture Principles
+
+Several principles guide the evolution of the environment.
+
+### Keep Management Private
+
+Administrative services should not be exposed directly to the public Internet unless there is a specific requirement.
+
+### Separate Responsibilities
+
+Each service should have a clearly defined purpose.
+
+```text
+Jellyfin ≠ File Server
+Pi-hole ≠ Firewall
+Homepage ≠ Monitoring Platform
+Reverse Proxy ≠ Network Security
+```
+
+### Match Isolation to Risk
+
+```text
+Normal Linux Service
+        ↓
+       LXC
+
+Sensitive Appliance
+        ↓
+        VM
+
+Higher-Risk Testing
+        ↓
+Isolated VM / Lab Network
+```
+
+### Local First
+
+Smart-home and infrastructure services should operate locally whenever practical.
+
+### Recovery Is Part of Infrastructure
+
+Deployment is incomplete without a recovery strategy.
+
+### Document Reality
+
+Implemented and planned architecture are documented separately.
+
+---
+
+# Selected Lessons Learned
+
+Operating the HomeLab has produced several practical lessons:
+
+- Virtualization does not automatically provide network segmentation.
+- Snapshots are not backups.
+- Backups need independent failure domains.
+- Docker inside LXC introduces compatibility/security trade-offs.
+- External storage should not prevent the hypervisor from booting.
+- Disk modification should follow a read-only-first workflow.
+- Shared media paths must be designed consistently.
+- Monitoring and security monitoring are different disciplines.
+- Update awareness can be preferable to blind automatic updates.
+- Remote-access VPNs and outbound privacy VPNs solve different problems.
+- Documentation becomes part of the infrastructure as systems grow.
+
+The full retrospective is available in:
+
+[Lessons Learned](docs/lessons-learned.md)
+
+---
+
+# Current Limitations
+
+This project intentionally documents areas that are not yet complete.
+
+Current limitations include:
+
+- Primarily flat LAN
+- No production VLAN segmentation yet
+- Single Proxmox host
+- Media and backups sharing one physical HDD
+- Docker inside LXC with relaxed AppArmor
+- exFAT storage with permissive filesystem semantics
+- No SIEM deployment yet
+- No IDS/IPS deployment yet
+- Limited centralized security logging
+- Experimental workloads currently sharing the primary LAN
+
+These are part of the roadmap rather than being hidden from the project documentation.
+
+---
+
+# Roadmap
+
+Future improvements include:
+
+### Networking & Security
+
+- Management VLAN
+- Services VLAN
+- IoT VLAN
+- Lab VLAN
+- Guest VLAN
+- Inter-VLAN firewall rules
+- Stronger management-network restrictions
+
+### Detection
+
+- Wazuh
+- Suricata
+- Centralized logging
+- Security dashboards
+- Authentication monitoring
+
+### Backup & Storage
+
+- Independent backup disk
+- Proxmox Backup Server
+- Automated restore testing
+- Off-site encrypted backups
+- Storage-health alerting
+
+### Automation
+
+- Ansible
+- Infrastructure-as-Code
+- Configuration templates
+- Secret management
+- Automated compliance checks
+
+### Lab
+
+- Dedicated isolated test network
+- Separate attacker and target machines
+- OWASP testing environments
+- Vulnerability scanning
+- CI/CD experimentation
+
+---
+
+# Skills Demonstrated
+
+This project provides practical experience with:
+
+```text
+Proxmox VE
+Linux Administration
+Virtual Machines
+LXC Containers
+Docker
+Docker Compose
+Home Assistant
+Zigbee
+ESP32
+Jellyfin
+Intel VA-API
+Linux Storage
+Samba
+Networking
+DNS
+Pi-hole
+VPNs
+Tailscale
+WireGuard
+Reverse Proxies
+Prometheus
+Grafana
+Uptime Monitoring
+Backup & Recovery
+Threat Modeling
+Application Security
+Troubleshooting
+Technical Documentation
+```
+
+---
+
+# Why This Project Matters
+
+The HomeLab is intentionally documented as more than a collection of self-hosted applications.
+
+It demonstrates the complete infrastructure lifecycle:
+
+```text
+Design
+   ↓
+Deploy
+   ↓
+Integrate
+   ↓
+Secure
+   ↓
+Monitor
+   ↓
+Break
+   ↓
+Troubleshoot
+   ↓
+Recover
+   ↓
+Document
+   ↓
+Improve
+```
+
+The project provides a practical environment for understanding how individual technologies interact as part of a complete system.
+
+---
+
+# Status
+
+The HomeLab is actively evolving.
+
+Current focus areas are:
+
+```text
+Network Segmentation
+Security Monitoring
+Backup Resilience
+Infrastructure Automation
+Smart-Home Development
+Lab Expansion
+```
+
+Detailed implementation decisions and current limitations are documented throughout the repository.
