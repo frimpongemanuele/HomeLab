@@ -1,0 +1,120 @@
+<mxfile host="Electron">
+  <diagram name="Page-1" id="D0xlpkGuujlCXcS5JojU">
+    <mxGraphModel dx="2054" dy="841" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="MoUFfIslZxmV_GV6COMT-4" edge="1" parent="1" style="endArrow=none;html=1;rounded=0;fontFamily=Helvetica;fontSize=14;fontColor=default;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="275" y="140" as="sourcePoint" />
+            <mxPoint x="536" y="140" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MoUFfIslZxmV_GV6COMT-5" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;startSize=6;fontSize=14;" target="MoUFfIslZxmV_GV6COMT-8" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="274.08000000000004" y="140" />
+            </Array>
+            <mxPoint x="279.5" y="140" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MoUFfIslZxmV_GV6COMT-6" edge="1" parent="1" source="MoUFfIslZxmV_GV6COMT-10" style="endArrow=none;html=1;rounded=0;fontFamily=Helvetica;fontSize=14;fontColor=default;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="406.08000000000004" y="140" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MoUFfIslZxmV_GV6COMT-7" edge="1" parent="1" source="MoUFfIslZxmV_GV6COMT-11" style="endArrow=none;html=1;rounded=0;fontFamily=Helvetica;fontSize=14;fontColor=default;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="536.5" y="140" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MoUFfIslZxmV_GV6COMT-15" edge="1" parent="1" source="MoUFfIslZxmV_GV6COMT-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Helvetica;fontSize=14;fontColor=default;" target="MoUFfIslZxmV_GV6COMT-14" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MoUFfIslZxmV_GV6COMT-8" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontSize=14;spacingTop=2;spacingBottom=2;" value="HAOS VM" vertex="1">
+          <mxGeometry height="15" width="90" x="230.5" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="MoUFfIslZxmV_GV6COMT-19" edge="1" parent="1" source="MoUFfIslZxmV_GV6COMT-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Helvetica;fontSize=14;fontColor=default;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="MoUFfIslZxmV_GV6COMT-20" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="405.5" y="280" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MoUFfIslZxmV_GV6COMT-21" connectable="0" parent="MoUFfIslZxmV_GV6COMT-19" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontFamily=Helvetica;fontSize=14;fontColor=default;" value="Proxmox Backup" vertex="1">
+          <mxGeometry relative="1" x="0.0041" y="1" as="geometry">
+            <mxPoint x="2" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MoUFfIslZxmV_GV6COMT-10" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontSize=14;" value="Proxmox" vertex="1">
+          <mxGeometry height="30" width="53" x="379" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="MoUFfIslZxmV_GV6COMT-17" edge="1" parent="1" source="MoUFfIslZxmV_GV6COMT-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Helvetica;fontSize=14;fontColor=default;endArrow=none;endFill=0;" target="MoUFfIslZxmV_GV6COMT-16" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MoUFfIslZxmV_GV6COMT-11" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontSize=14;" value="Configs" vertex="1">
+          <mxGeometry height="15" width="60" x="506.5" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="MoUFfIslZxmV_GV6COMT-12" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Helvetica;fontSize=14;fontColor=default;endArrow=none;endFill=0;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="406.0000000000001" y="85" as="sourcePoint" />
+            <mxPoint x="406" y="140" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MoUFfIslZxmV_GV6COMT-13" parent="1" style="whiteSpace=wrap;html=1;rounded=0;align=center;verticalAlign=top;fontSize=14;spacingTop=2;spacingLeft=0;strokeWidth=1;spacing=2;strokeColor=none;fillColor=none;fontStyle=1" value="&lt;p style=&quot;margin-top: 10px; margin-bottom: 0px; margin-left: 0px;&quot;&gt;&lt;font face=&quot;Times New Roman&quot;&gt;PROXMOX HOST&lt;/font&gt;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="50" width="240" x="286" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="MoUFfIslZxmV_GV6COMT-23" edge="1" parent="1" source="MoUFfIslZxmV_GV6COMT-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Helvetica;fontSize=14;fontColor=default;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="MoUFfIslZxmV_GV6COMT-20" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="275.5" y="367.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MoUFfIslZxmV_GV6COMT-14" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontSize=14;" value="HA Backup" vertex="1">
+          <mxGeometry height="15" width="90" x="230.5" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="MoUFfIslZxmV_GV6COMT-16" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontSize=14;" value="&lt;div&gt;Git&lt;/div&gt;" vertex="1">
+          <mxGeometry height="15" width="60" x="506.5" y="265" as="geometry" />
+        </mxCell>
+        <mxCell id="MoUFfIslZxmV_GV6COMT-26" edge="1" parent="1" source="MoUFfIslZxmV_GV6COMT-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Helvetica;fontSize=14;fontColor=default;" target="MoUFfIslZxmV_GV6COMT-27" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MoUFfIslZxmV_GV6COMT-20" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;fontFamily=Helvetica;fontSize=14;" value="&lt;div&gt;3 TB HDD&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left; margin-left: -10px;&quot;&gt;Media&lt;/div&gt;&lt;div style=&quot;text-align: left; margin-left: -10px;&quot;&gt;PVE Backups&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="134" x="338" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="MoUFfIslZxmV_GV6COMT-27" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontSize=14;" value="⚠ Shared&lt;br&gt;                       failure domain" vertex="1">
+          <mxGeometry height="40" width="146" x="332" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="MoUFfIslZxmV_GV6COMT-30" edge="1" parent="1" source="MoUFfIslZxmV_GV6COMT-28" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Helvetica;fontSize=14;fontColor=default;startArrow=classic;startFill=1;endArrow=none;endFill=0;" target="MoUFfIslZxmV_GV6COMT-29" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MoUFfIslZxmV_GV6COMT-28" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontSize=14;" value="Google Drive" vertex="1">
+          <mxGeometry height="30" width="90" x="70" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="MoUFfIslZxmV_GV6COMT-29" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontSize=14;" value="HA" vertex="1">
+          <mxGeometry height="30" width="35.5" x="210" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="MoUFfIslZxmV_GV6COMT-31" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontSize=14;" value="off-host backup" vertex="1">
+          <mxGeometry height="40" width="120" x="60" y="450" as="geometry" />
+        </mxCell>
+        <mxCell id="MoUFfIslZxmV_GV6COMT-34" edge="1" parent="1" source="MoUFfIslZxmV_GV6COMT-32" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Helvetica;fontSize=12;fontColor=default;" target="MoUFfIslZxmV_GV6COMT-33" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MoUFfIslZxmV_GV6COMT-35" connectable="0" parent="MoUFfIslZxmV_GV6COMT-34" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontFamily=Helvetica;fontSize=12;fontColor=default;" value="Separate" vertex="1">
+          <mxGeometry relative="1" x="0.5027" as="geometry">
+            <mxPoint x="30" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MoUFfIslZxmV_GV6COMT-32" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Primay Storage" vertex="1">
+          <mxGeometry height="30" width="100" x="570" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="MoUFfIslZxmV_GV6COMT-37" edge="1" parent="1" source="MoUFfIslZxmV_GV6COMT-33" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Helvetica;fontSize=12;fontColor=default;" target="MoUFfIslZxmV_GV6COMT-36" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MoUFfIslZxmV_GV6COMT-33" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Backup Storage" vertex="1">
+          <mxGeometry height="30" width="100" x="700" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="MoUFfIslZxmV_GV6COMT-36" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Off-site Copy" vertex="1">
+          <mxGeometry height="30" width="100" x="700" y="480" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
