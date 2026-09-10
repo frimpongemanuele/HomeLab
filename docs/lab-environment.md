@@ -40,34 +40,30 @@ The goal is to separate experimentation from the stable services that support th
 
 # Architecture
 
-The lab currently runs as an independent LXC container on the Proxmox host.
+The lab environment is deliberately separated from the stable HomeLab workloads and is used for development, experimentation, and security testing.
 
-```text
-                     Proxmox VE
-                         │
-          ┌──────────────┼──────────────┐
-          │              │              │
-      Stable         Services          Lab
-     Workloads                          │
-          │                             ▼
-     HA / Jellyfin                  LXC 106
-     Pi-hole etc.                    WebApp
-                                        │
-                               Development / Testing
-                                        │
-                           ┌────────────┼────────────┐
-                           ▼            ▼            ▼
-                       Web Apps       APIs       Security
-                                                 Testing
-```
+![Lab Environment Architecture - Current and Target State](../diagrams/exported/lab-architecture.svg)
 
-The LXC boundary separates the lab filesystem and processes from the other HomeLab workloads.
+The diagram shows the difference between the current and target security models.
 
-However, the current network remains primarily flat.
+### Current State
 
-This distinction is important:
+LXC 106 hosts the WebApp development and testing environment on the same `192.168.1.0/24` flat LAN used by the rest of the HomeLab.
 
-> **Virtualization isolation does not automatically provide network isolation.**
+The container provides compute and filesystem isolation, but it does not yet provide strong network isolation. A compromised or intentionally vulnerable lab workload could potentially communicate with other systems on the LAN.
+
+### Target State
+
+The planned design moves lab workloads into a dedicated **Lab VLAN** protected by firewall rules.
+
+The intended policy is:
+
+- **Lab → Internet:** allowed where required
+- **Lab → Management:** denied
+- **Lab → Services:** denied by default
+- **Admin / VPN → Lab:** allowed for authorized management
+
+This reduces the potential blast radius of experimental workloads and creates a much stronger boundary between trusted infrastructure and the security lab.
 
 ---
 
