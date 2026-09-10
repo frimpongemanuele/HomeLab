@@ -4,63 +4,54 @@
 
 This document describes the architecture of my self-hosted HomeLab environment.
 
-The platform is built around **Proxmox VE** running on a Lenovo ThinkCentre M720q Tiny and is designed to provide a modular environment for virtualization, smart home automation, media services, secure remote access, monitoring, and cybersecurity experimentation.
+The lab is built around a **Lenovo ThinkCentre M720q Tiny** running **Proxmox VE** and is designed as a modular platform for:
+
+* Virtualization
+* Containerization
+* Smart home automation
+* Media services
+* Secure remote access
+* Networking
+* Monitoring and observability
+* Web application testing
+* Cybersecurity experimentation
 
 The infrastructure evolved from an older laptop-based server into a dedicated mini-PC platform to improve reliability, isolation, scalability, and maintainability.
 
 The current design follows several core principles:
 
-* Separate major workloads using virtual machines and LXC containers
+* Separate major workloads using VMs, LXC containers, and Docker containers
 * Keep management services private
 * Avoid unnecessary public exposure
 * Use centralized shared storage for media and backups
 * Maintain portability of the external storage device
-* Keep the environment simple enough to maintain while still allowing future expansion
+* Separate stable infrastructure from experimental workloads
+* Add monitoring and observability as first-class infrastructure components
+* Keep the environment simple enough to maintain while allowing future expansion
 
 ---
 
 ## High-Level Architecture
 
-The Proxmox host is the central compute node of the environment.
+![HomeLab High-Level Architecture](../diagrams/exported/homelab-architecture.svg)
 
-```text
-Internet
-   │
-   ├── Tailscale VPN
-   └── WireGuard VPN
-           │
-           ▼
-      Home Network
-           │
-      TIM HUB+ Router
-           │
-           ▼
-    Proxmox VE Host
-           │
-    ┌──────┼───────────────┐
-    │      │               │
-    ▼      ▼               ▼
-HAOS VM  Jellyfin LXC   Docker LXC
-                           │
-              ┌────────────┼────────────┐
-              │            │            │
-            Radarr       Sonarr      Prowlarr
-              │            │            │
-              └────────────┼────────────┘
-                           │
-                       qBittorrent
-                           │
-                           ▼
-                    Shared Storage
-```
+The Proxmox host acts as the central compute node of the environment.
 
-The system is intentionally divided into multiple logical layers.
+At a high level, the infrastructure is organized into:
+
+1. Physical and network layer
+2. Virtualization layer
+3. Application and service layer
+4. Storage layer
+5. Remote-access layer
+6. Monitoring and observability layer
+7. Experimental lab layer
 
 ---
 
-## Physical Layer
+# Physical Infrastructure
 
-### Proxmox Host
+## Proxmox Host
 
 The primary compute node is a:
 
@@ -80,13 +71,13 @@ Current hardware configuration:
 | Network         | Gigabit Ethernet       |
 | Hypervisor      | Proxmox VE             |
 
-The system was selected because of its relatively low power consumption, compact size, Intel virtualization support, and integrated Intel GPU.
+The system was selected because of its relatively low power consumption, compact size, Intel virtualization support, and integrated GPU.
 
-The UHD Graphics 630 is also used by Jellyfin for hardware-accelerated video transcoding through VAAPI.
+The **Intel UHD Graphics 630** is also used by Jellyfin for hardware-accelerated transcoding through **VAAPI**.
 
 ---
 
-## Network Layer
+# Network Layer
 
 The HomeLab currently operates inside the main home LAN.
 
@@ -94,20 +85,22 @@ The primary router is a **TIM HUB+**, which provides:
 
 * Internet gateway
 * DHCP
-* Local DNS
+* Local DNS forwarding
 * NAT
 * Wi-Fi connectivity
 * Gigabit Ethernet connectivity
 
-The Proxmox host is assigned a stable internal address using a static configuration or DHCP reservation.
+The Proxmox host and core services use stable internal addresses through static configuration or DHCP reservations.
 
-Internal services are not intentionally exposed through public port forwarding.
+The current environment is primarily based on a single LAN, while VLAN segmentation is planned as a future improvement.
 
-Remote access is instead provided through encrypted VPN solutions.
+---
 
-### Remote Access
+## Remote Access
 
-Two VPN technologies are currently used within the environment:
+Remote access is implemented through encrypted VPN technologies rather than exposing administrative services directly to the Internet.
+
+The environment currently uses:
 
 * **Tailscale**
 * **WireGuard**
@@ -116,66 +109,86 @@ Tailscale is used as the main secure remote-access mechanism for infrastructure 
 
 WireGuard is also available through Home Assistant for remote connectivity.
 
-This allows access to services such as:
+This provides secure access to services such as:
 
 * Proxmox
 * Home Assistant
 * Jellyfin
 * Homepage
-* Internal management interfaces
+* Monitoring interfaces
+* Internal application dashboards
 
-without exposing their administration ports directly to the public Internet.
+without requiring conventional public port forwarding.
 
 ---
 
-## Virtualization Layer
+# Virtualization Layer
 
-Proxmox VE provides the virtualization layer for the lab.
+**Proxmox VE** provides the virtualization layer for the lab.
 
-Different workloads are separated according to their requirements.
+The environment intentionally combines:
 
-### Virtual Machine
+* KVM virtual machines
+* LXC system containers
+* Docker application containers
+
+Each technology is used according to the requirements of the workload.
+
+---
+
+## Virtual Machines
 
 | ID  | Workload          | Type |
 | --- | ----------------- | ---- |
 | 100 | Home Assistant OS | VM   |
 
-### LXC Containers
+---
 
-| ID  | Workload  | Role                           |
-| --- | --------- | ------------------------------ |
-| 101 | Jellyfin  | Media server                   |
-| 102 | Docker    | Containerized application host |
-| 103 | Tailscale | Remote-access service          |
-| 104 | Homepage  | Centralized dashboard          |
+## LXC Containers
 
-Additional monitoring and security workloads may be deployed as the environment evolves.
+| ID  | Workload  | Role                                         |
+| --- | --------- | -------------------------------------------- |
+| 101 | Jellyfin  | Media server                                 |
+| 102 | Docker    | Containerized application host               |
+| 103 | Tailscale | Secure remote access                         |
+| 104 | Homepage  | Centralized dashboard                        |
+| 105 | Pi-hole   | DNS filtering and ad blocking                |
+| 106 | WebApp    | Development and security testing environment |
+
+The environment therefore separates infrastructure services, user-facing services, and experimental workloads at the virtualization layer.
 
 ---
 
-## Home Assistant VM
+# Home Assistant VM
 
 Home Assistant OS runs as a dedicated virtual machine rather than inside a container.
 
 This provides a complete Home Assistant appliance environment and simplifies:
 
-* Add-on management
+* Supervisor and add-on management
 * Integrations
-* USB device access
+* USB device passthrough
 * Backup and restore operations
 * Smart home device management
+* Zigbee integration
 
-The VM also interfaces with Zigbee devices through a **SONOFF Zigbee 3.0 USB Dongle Plus**.
+The VM interfaces with Zigbee devices through a **SONOFF Zigbee 3.0 USB Dongle Plus**.
 
-A Philips Hue Bridge remains part of the smart lighting environment.
+A **Philips Hue Bridge** is also part of the smart lighting environment.
+
+Home Assistant backups are additionally stored off-site through Google Drive.
+
+More details are documented in:
+
+[Home Assistant](home-assistant.md)
 
 ---
 
-## Jellyfin LXC
+# Jellyfin LXC
 
 Jellyfin runs inside a dedicated LXC container.
 
-Using LXC provides lower overhead than a full virtual machine while still separating the media server from the Proxmox host.
+Using LXC provides lower overhead than a full virtual machine while still separating the media server from the Proxmox host and Docker application stack.
 
 The Jellyfin container receives access to:
 
@@ -184,71 +197,151 @@ The Jellyfin container receives access to:
 /dev/dri/renderD128
 ```
 
-This enables VAAPI-based hardware transcoding using the Intel UHD Graphics 630 integrated GPU.
+This enables VAAPI-based hardware transcoding using the integrated Intel UHD Graphics 630 GPU.
 
-The external media storage is exposed to the container through a Proxmox bind mount.
+The media storage is exposed to the container through a Proxmox bind mount.
 
-From the Jellyfin container, the media libraries are available under:
+Inside Jellyfin, the media libraries are available under:
 
 ```text
 /media/movies
 /media/tv
 ```
 
-Further Jellyfin configuration is documented in:
+This allows Jellyfin to remain independent from the media automation stack while still consuming the same shared library.
 
-[`jellyfin.md`](jellyfin.md)
+Further configuration is documented in:
+
+[Jellyfin](jellyfin.md)
 
 ---
 
-## Docker Application Layer
+# Docker Application Layer
 
-A dedicated LXC container is used as a Docker host.
+A dedicated LXC container is used as the Docker host.
 
-This isolates Docker workloads from both the Proxmox host and the Jellyfin server.
-
-The container currently hosts the media automation stack through Docker Compose.
-
-The main services include:
-
-| Service     | Purpose              |
-| ----------- | -------------------- |
-| Prowlarr    | Indexer management   |
-| Radarr      | Movie management     |
-| Sonarr      | TV series management |
-| Bazarr      | Subtitle management  |
-| qBittorrent | Download client      |
-
-The logical media workflow is:
+This provides the following architecture:
 
 ```text
-Prowlarr
-   │
-   ├── Radarr
-   └── Sonarr
-         │
-         ▼
-     qBittorrent
-         │
-         ▼
-      Downloads
-         │
-         ▼
-   Media Library
-         │
-         ▼
-      Jellyfin
+Physical Host
+    │
+    ▼
+Proxmox VE
+    │
+    ▼
+LXC 102
+    │
+    ▼
+Docker Engine
+    │
+    ▼
+Application Containers
 ```
 
-The Docker implementation is documented separately in:
-
-[`docker-media-stack.md`](docker-media-stack.md)
+Docker Compose is used to manage multiple services grouped by function.
 
 ---
 
-## Shared Storage Architecture
+## Media Automation Services
 
-The lab uses an external **3 TB Seagate ST3000DM001 HDD** connected through an ICY BOX USB enclosure.
+The media automation stack currently includes:
+
+* Sonarr
+* Radarr
+* Prowlarr
+* Bazarr
+* qBittorrent
+* Jellyseerr
+* Dispatcharr
+
+These services automate media requests, downloads, organization, subtitles, and IPTV/live TV management.
+
+---
+
+## Networking Services
+
+Networking-related Docker services include:
+
+* Nginx Proxy Manager
+* Speedtest Tracker
+
+Nginx Proxy Manager is used as a reverse proxy for selected internal services.
+
+Speedtest Tracker records Internet connection performance over time.
+
+---
+
+## Monitoring and Maintenance Services
+
+The Docker host also runs several monitoring and maintenance services:
+
+* Prometheus
+* Grafana
+* Uptime Kuma
+* Netdata
+* Glances
+* What's Up Docker
+
+These provide metrics collection, dashboards, service-health monitoring, real-time resource visibility, and Docker image update tracking.
+
+The Docker implementation is documented in:
+
+[Docker & Media Stack](docker-media-stack.md)
+
+---
+
+# Pi-hole LXC
+
+Pi-hole runs in a dedicated lightweight LXC container.
+
+Its main functions include:
+
+* DNS-level advertisement blocking
+* Tracker filtering
+* Centralized DNS policy
+* DNS query visibility
+* Blocking selected unwanted domains
+
+Running Pi-hole independently from Docker improves resilience because DNS filtering remains available even if the Docker host is restarted or undergoing maintenance.
+
+Pi-hole also provides useful network telemetry that can help identify unexpected DNS activity.
+
+More detailed network documentation is available in:
+
+[Networking](networking.md)
+
+---
+
+# Web Application Testing LXC
+
+LXC 106 is reserved for web application development and testing.
+
+This environment is intentionally separated from stable services such as Home Assistant, Jellyfin, and DNS infrastructure.
+
+The WebApp LXC can be used for:
+
+* Deploying experimental web applications
+* Testing application frameworks
+* Reverse proxy testing
+* Web server administration
+* Application hardening
+* Controlled security testing
+* Vulnerability assessment
+* OWASP-focused experiments
+
+Because test applications may be intentionally insecure or unstable, this container is considered a higher-risk workload.
+
+A future improvement is to place this environment inside a dedicated **Lab VLAN** with restricted access to production-like services.
+
+See:
+
+[Lab Environment](lab-environment.md)
+
+---
+
+# Shared Storage Architecture
+
+The lab uses an external **3 TB Seagate ST3000DM001 HDD** connected through an **ICY BOX USB enclosure**.
 
 The drive is mounted on the Proxmox host at:
 
@@ -256,16 +349,20 @@ The drive is mounted on the Proxmox host at:
 /mnt/media
 ```
 
-The current filesystem is **exFAT**.
+The current filesystem is:
 
-exFAT was intentionally selected because the drive must remain portable and readable from:
+```text
+exFAT
+```
+
+exFAT was selected because the disk must remain portable and readable from:
 
 * Linux / Proxmox
 * Windows
 * macOS
 * Other computers if required
 
-The current storage structure is approximately:
+The current structure is approximately:
 
 ```text
 /mnt/media/
@@ -274,19 +371,24 @@ The current storage structure is approximately:
 └── proxmox-backups/
 ```
 
-The same physical HDD currently stores both media and Proxmox backups.
+The same physical disk currently stores:
 
-This is convenient and functional for the current lab, but it creates a shared failure domain: failure of the disk would affect both the media library and the local infrastructure backups.
+* Jellyfin media
+* Proxmox backups
 
-For this reason, separating media storage and backup storage is planned as a future improvement.
+This is convenient for the current HomeLab, but it creates a **shared failure domain**.
+
+If the physical disk fails, both the media library and local Proxmox backups are affected.
+
+A future improvement is therefore to separate media storage from backup storage.
 
 ---
 
-## Storage Mount Strategy
+# Storage Mount Strategy
 
-Because the storage device is external, the Proxmox host must remain bootable if the disk is disconnected or unavailable.
+Because the external disk may not always be connected or available during boot, the Proxmox host must remain bootable without it.
 
-The drive is therefore mounted using UUID-based configuration and the `nofail` option.
+The drive is mounted using UUID-based configuration and the `nofail` option.
 
 Example:
 
@@ -294,136 +396,261 @@ Example:
 UUID=XXXX-XXXX /mnt/media exfat defaults,nofail,uid=1000,gid=1000,umask=000 0 0
 ```
 
-The `nofail` option was introduced after a previous mount configuration caused Proxmox to enter emergency mode when the external drive could not be mounted during startup.
+The `nofail` option was introduced after an earlier storage configuration caused Proxmox to enter emergency mode when the external disk could not be mounted.
 
-This experience directly influenced the final storage design.
+This incident directly influenced the current storage design.
 
 ---
 
-## File Sharing
+# File Sharing
 
-The media storage is also exposed to Windows systems using Samba.
+The shared media disk is also exposed to Windows systems through **Samba**.
 
-Example logical path:
+Example path:
 
 ```text
 \\PROXMOX-HOST\media
 ```
 
-A dedicated Samba account is used instead of anonymous guest access.
+A dedicated Samba account is used instead of guest access.
 
 SMB1 is disabled because it is obsolete and insecure.
 
-The Samba layer allows media management and file transfers from Windows without requiring direct physical access to the external HDD.
+This provides a convenient method for transferring and managing media files from Windows without disconnecting the physical HDD from the Proxmox host.
 
 ---
 
-## Dashboard and Observability
+# Media Data Flow
 
-Homepage is deployed as a centralized dashboard for accessing and monitoring HomeLab services.
+The media automation workflow is organized into several stages.
 
-The dashboard integrates with services such as:
+```text
+Jellyseerr
+     │
+     ▼
+Sonarr / Radarr
+     │
+     ├──────► Prowlarr
+     │
+     ▼
+qBittorrent
+     │
+     ▼
+Downloads
+     │
+     ▼
+Sonarr / Radarr Import
+     │
+     ├──────────────┐
+     │              │
+     ▼              ▼
+/media/tv      /media/movies
+     │              │
+     └───────┬──────┘
+             ▼
+          Jellyfin
+```
 
-* Proxmox
+Bazarr provides subtitle automation alongside the media libraries.
+
+Dispatcharr is used for IPTV and live TV management.
+
+This design separates:
+
+* Content requests
+* Indexing
+* Downloading
+* Media organization
+* Subtitle management
+* Media playback
+
+More detail is available in:
+
+[Docker & Media Stack](docker-media-stack.md)
+
+---
+
+# Reverse Proxy Layer
+
+**Nginx Proxy Manager** provides reverse-proxy functionality for selected internal web applications.
+
+This allows internal services to be accessed using easier-to-manage hostnames rather than individual IP and port combinations.
+
+The reverse proxy also provides a foundation for:
+
+* Internal HTTPS
+* Centralized TLS termination
+* Consistent service hostnames
+* Reduced direct interaction with application ports
+
+Reverse proxying is treated as an access-management layer and not as a replacement for firewalling or network segmentation.
+
+---
+
+# Dashboard and Operational Overview
+
+**Homepage** provides the main centralized dashboard for the HomeLab.
+
+It aggregates information from multiple services and displays their operational state in one interface.
+
+The dashboard is currently organized into areas such as:
+
+* Smart Home
+* Media
+* Infrastructure
+* Downloads
+* Network
+* Monitoring
+
+Integrated services include:
+
 * Home Assistant
 * Jellyfin
-* Other internal applications
-
-Monitoring has also been expanded with tools including:
-
-* Prometheus
-* Grafana
+* Proxmox
+* Docker
+* Tailscale
+* Sonarr
+* Radarr
+* Prowlarr
+* qBittorrent
+* Bazarr
+* Jellyseerr
+* Dispatcharr
+* Pi-hole
+* Nginx Proxy Manager
+* Speedtest Tracker
 * Uptime Kuma
-* Proxmox metrics
-* Jellyfin metrics
-* Home Assistant metrics
+* Netdata
+* Glances
+* What's Up Docker
+* Grafana
+* Prometheus
 
-These services provide greater visibility into availability, performance, and resource usage.
+Homepage is considered the **operational aggregation layer**, not the primary monitoring backend.
+
+Historical metrics and service monitoring are provided by the dedicated observability tools.
 
 ---
 
-## Backup Architecture
+# Monitoring and Observability
+
+The HomeLab now includes a dedicated monitoring stack.
+
+![Monitoring & Observability Architecture](../diagrams/exported/monitoring-architecture.svg)
+
+The monitoring architecture includes:
+
+* **Prometheus** — metrics collection and querying
+* **Grafana** — dashboards and historical visualization
+* **Uptime Kuma** — service availability monitoring
+* **Netdata** — detailed real-time infrastructure metrics
+* **Glances** — lightweight live system metrics
+* **What's Up Docker** — Docker image update visibility
+* **Speedtest Tracker** — WAN performance history
+* **Homepage** — centralized operational overview
+
+This layered design provides both:
+
+* Real-time visibility
+* Historical analysis
+* Service-health monitoring
+* Infrastructure capacity monitoring
+* Update awareness
+
+Detailed monitoring documentation is available in:
+
+[Monitoring & Observability](monitoring.md)
+
+---
+
+# Backup Architecture
 
 The lab currently uses multiple backup mechanisms.
 
-### Proxmox
+## Proxmox Backups
 
-Virtual machines and containers are backed up to:
+Virtual machines and LXC containers are backed up to:
 
 ```text
 /mnt/media/proxmox-backups
 ```
 
-A snapshot-based workflow is also used before significant changes:
+A snapshot-based workflow is also used before significant changes.
 
 ```text
-Create snapshot
+Create Snapshot
       │
       ▼
-Apply update/change
+Apply Update / Change
       │
       ▼
-Test services
+Test Services
    ┌──┴──┐
    │     │
-   OK   Failure
+Success Failure
    │     │
    ▼     ▼
-Delete Rollback
-snapshot
+Delete  Rollback
+Snapshot
 ```
-
-### Home Assistant
-
-Home Assistant backups are also copied off-site using Google Drive.
-
-This provides a second recovery location for one of the most important workloads.
-
-Backup design and the storage recovery incident are documented in:
-
-[`backup-recovery.md`](backup-recovery.md)
 
 ---
 
-## Security Architecture
+## Home Assistant Backups
 
-The infrastructure currently follows a low-exposure model.
+Home Assistant backups are also copied off-site to Google Drive.
 
-The main principles are:
+This provides an independent recovery location for one of the most important workloads.
+
+Backup design and the previous storage recovery incident are documented in:
+
+[Backup & Recovery](backup-recovery.md)
+
+---
+
+# Security Architecture
+
+The infrastructure currently follows a low-exposure security model.
+
+The main principles include:
 
 * No unnecessary public port forwarding
 * VPN-based remote administration
-* Separation of workloads
-* Dedicated API tokens where possible
+* Workload separation
+* Dedicated service containers
 * Authenticated SMB access
-* Legacy SMB1 disabled
+* API tokens where supported
+* SMB1 disabled
 * Snapshots before infrastructure changes
-* Backup of critical workloads
+* Multi-layer backups
+* DNS filtering through Pi-hole
+* Separate testing environment
 
-Current segmentation is primarily performed at the virtualization and service level.
+Current segmentation is mainly performed at the virtualization and service level.
 
-Full network segmentation using dedicated VLANs is planned but has not yet been implemented.
+Full VLAN-based network segmentation has not yet been implemented.
 
-The planned model includes:
+The planned network model includes:
 
 ```text
 Management VLAN
+Services VLAN
 IoT VLAN
-Media VLAN
+Lab VLAN
 Guest VLAN
 ```
 
-with explicit firewall rules controlling communication between zones.
+with explicit firewall rules controlling communication between trust zones.
 
-Detailed security controls and the lab threat model are documented in:
+Detailed security controls and the HomeLab threat model are documented in:
 
-[`cybersecurity.md`](cybersecurity.md)
+[Cybersecurity](cybersecurity.md)
 
 ---
 
-## Design Decisions
+# Architectural Decisions
 
-### Why Proxmox?
+## Why Proxmox?
 
 Proxmox provides:
 
@@ -432,70 +659,139 @@ Proxmox provides:
 * Snapshot functionality
 * Backup integration
 * Linux-based administration
-* Flexible hardware passthrough
+* Hardware passthrough
+* Flexible storage management
 
-It allows multiple infrastructure technologies to be tested on a single physical machine.
+It allows multiple infrastructure technologies to be tested on a single physical system.
 
-### Why LXC for Jellyfin?
+---
 
-Jellyfin does not require a complete virtual machine.
+## Why a VM for Home Assistant?
+
+Home Assistant OS benefits from running as a complete appliance.
+
+Using a dedicated VM preserves:
+
+* Supervisor support
+* Add-ons
+* Straightforward updates
+* Backup integration
+* Device passthrough
+
+---
+
+## Why LXC for Jellyfin?
+
+Jellyfin does not require a full virtual machine.
 
 Using LXC provides:
 
 * Lower memory overhead
 * Lower storage overhead
 * Direct Linux integration
-* Straightforward GPU device passthrough
-
-### Why a Separate Docker LXC?
-
-Running Docker separately avoids mixing application containers with the Proxmox host.
-
-This improves organization and reduces the number of applications installed directly on the hypervisor.
-
-### Why exFAT?
-
-The external media disk needs to remain portable.
-
-Using exFAT provides native or straightforward compatibility across multiple operating systems while supporting large media files.
-
-The trade-off is that exFAT lacks many Linux-native filesystem features such as Unix permissions, journaling, and advanced integrity mechanisms.
-
-For a future dedicated storage server or NAS, a filesystem better suited to server workloads would be preferable.
+* Straightforward GPU passthrough
 
 ---
 
-## Current Limitations
+## Why a Separate Docker LXC?
 
-The present architecture is intentionally practical rather than enterprise-grade.
+Running Docker in a dedicated LXC prevents application containers from being installed directly on the Proxmox host.
 
-Current limitations include:
+This improves:
 
-* Media and local Proxmox backups share the same physical HDD
+* Organization
+* Separation
+* Maintainability
+* Backup management
+
+Docker inside LXC does, however, require relaxed container security settings and is therefore documented as a conscious trade-off.
+
+---
+
+## Why a Dedicated Pi-hole LXC?
+
+DNS is an important infrastructure service.
+
+Keeping Pi-hole outside the Docker host means DNS filtering can continue to operate independently of Docker maintenance or failures.
+
+---
+
+## Why a Separate WebApp Lab?
+
+Experimental applications should not share the same trust level as stable infrastructure.
+
+The dedicated WebApp LXC provides a controlled environment for:
+
+* Development
+* Deployment testing
+* Hardening
+* Security experiments
+
+and can later be isolated further using VLAN segmentation.
+
+---
+
+## Why exFAT?
+
+The external media disk must remain portable.
+
+exFAT provides compatibility across:
+
+* Linux
+* Windows
+* macOS
+
+while supporting large media files.
+
+The trade-off is that exFAT lacks several Linux-native filesystem features such as:
+
+* Unix permissions
+* Journaling
+* Advanced integrity features
+
+For a future dedicated NAS or storage server, a server-oriented filesystem would be more appropriate.
+
+---
+
+# Current Limitations
+
+The current architecture is intentionally practical rather than enterprise-grade.
+
+Known limitations include:
+
+* Media and Proxmox backups share the same physical HDD
 * No full VLAN segmentation yet
 * Single physical Proxmox node
 * No storage redundancy
 * No high availability
-* Docker inside LXC requires relaxed AppArmor configuration
-* External USB storage represents a single point of failure
+* External USB storage is a single point of failure
+* Docker inside LXC requires relaxed AppArmor settings
+* Several services depend on the same Docker LXC
+* Security monitoring is still being expanded
+* No dedicated IDS/IPS or SIEM is currently deployed
 
-These limitations are documented rather than hidden because they represent areas for future experimentation and improvement.
+These limitations are intentionally documented because they represent future learning and improvement opportunities.
 
 ---
 
-## Future Architecture
+# Future Architecture
 
 Planned improvements include:
 
 * Dedicated backup storage
 * VLAN-based network segmentation
 * Inter-VLAN firewall policies
-* Gluetun VPN isolation for download traffic
+* Dedicated Lab VLAN
+* Dedicated downloader VPN isolation
 * Centralized security logging
 * Wazuh or Suricata integration
+* Expanded Prometheus exporters
+* Grafana alerting
 * Automated configuration backups
-* Infrastructure deployment using Ansible
-* Secret management
-* Expanded monitoring and alerting
+* Infrastructure deployment through Ansible
+* Secrets management
+* Internal HTTPS expansion
+* Improved backup testing
+* Additional controlled cybersecurity workloads
 
-The long-term objective is to evolve the HomeLab from a single-node self-hosted environment into a more segmented and observable infrastructure platform while preserving simplicity and low operational cost.
+The long-term objective is to evolve the HomeLab from a single-node self-hosted environment into a more segmented, observable, secure, and reproducible infrastructure platform while maintaining reasonable complexity and operating cost.
