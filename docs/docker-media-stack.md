@@ -183,47 +183,22 @@ The Docker environment currently contains services across several functional gro
 
 # Media Automation Architecture
 
-The media automation stack separates different responsibilities across several applications.
+![Media Automation Pipeline](../diagrams/exported/media-pipeline.svg)
 
-```text
-                   Jellyseerr
-                       │
-                       ▼
-             ┌─────────┴─────────┐
-             │                   │
-           Sonarr              Radarr
-          TV Shows             Movies
-             │                   │
-             └─────────┬─────────┘
-                       │
-                       ▼
-                    Prowlarr
-                 Indexer Manager
-                       │
-                       ▼
-                  qBittorrent
-                 Download Client
-                       │
-                       ▼
-                    Downloads
-                       │
-             ┌─────────┴─────────┐
-             │                   │
-             ▼                   ▼
-           Sonarr              Radarr
-          Import TV          Import Movies
-             │                   │
-             ▼                   ▼
-         /media/tv         /media/movies
-             │                   │
-             └─────────┬─────────┘
-                       ▼
-                    Jellyfin
-```
+The media stack separates content requests, discovery, downloading, organization, subtitle management, and playback into independent services.
 
-Bazarr operates alongside the media library to manage subtitle acquisition and organization.
+The main workflow is:
 
-Dispatcharr provides IPTV and live TV management independently from the normal Sonarr/Radarr workflow.
+1. Users request movies or series through **Jellyseerr**.
+2. Requests are sent to **Sonarr** or **Radarr**.
+3. Sonarr and Radarr use **Prowlarr** to query configured indexers.
+4. Approved downloads are sent to **qBittorrent**.
+5. Completed downloads are imported and renamed.
+6. Files are organized into the appropriate media library.
+7. **Bazarr** manages subtitles alongside the organized media.
+8. **Jellyfin** scans and serves the final libraries.
+
+**Dispatcharr** operates separately for IPTV and live TV workflows rather than as part of the normal download/import pipeline.
 
 ---
 
