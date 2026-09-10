@@ -23,7 +23,7 @@ The environment currently uses multiple recovery mechanisms:
 
 The current backup strategy follows a layered approach.
 
-
+![HomeLab Backup and Recovery Architecture](../diagrams/exported/backup-architecture.svg)
 
 The diagram shows both the **current backup implementation** and the **target architecture**.
 
