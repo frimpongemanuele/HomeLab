@@ -24,34 +24,20 @@ This separation provides:
 
 # Architecture
 
-The Jellyfin architecture separates media acquisition from media consumption.
+Jellyfin runs as a dedicated LXC container on Proxmox, while media acquisition is handled separately inside the Docker LXC.
 
-```text
-                   Media Automation
-                        Docker
-                           │
-               Sonarr / Radarr / Bazarr
-                           │
-                           ▼
-                    Shared Storage
-                     /mnt/media
-                           │
-               ┌───────────┴───────────┐
-               │                       │
-          /media/movies            /media/tv
-               │                       │
-               └───────────┬───────────┘
-                           │
-                           ▼
-                    Jellyfin LXC
-                           │
-                           ▼
-                     Home Network
-                           │
-                ┌──────────┼──────────┐
-                ▼          ▼          ▼
-               TV        Browser    Mobile
-```
+![Jellyfin Architecture](../diagrams/exported/jellyfin-architecture.svg)
+
+The architecture separates three main concerns:
+
+- **Media serving** — Jellyfin runs independently in LXC 101.
+- **Media automation** — Sonarr, Radarr, qBittorrent, and related services run in Docker LXC 102.
+- **Storage** — the external 3 TB HDD is mounted on the Proxmox host and exposed to Jellyfin through a bind mount.
+
+The Intel integrated GPU is also exposed to the Jellyfin container through `/dev/dri`, allowing VA-API hardware-accelerated transcoding.
+
+This separation keeps media serving independent from download and automation workloads while still allowing both environments to access the same media library.
+
 
 Jellyfin is therefore the final presentation layer of the media pipeline.
 
