@@ -27,45 +27,14 @@ Instead of relying on a single monitoring product, the environment uses multiple
 
 The monitoring stack follows a layered model:
 
-```text
-Infrastructure / Services
-        │
-        ├── Proxmox
-        ├── Docker
-        ├── Linux Hosts
-        ├── Home Assistant
-        ├── Jellyfin
-        └── Network Services
-                │
-                ▼
-        Metrics / Health Sources
-                │
-        ┌───────┼──────────────┐
-        │       │              │
-   Exporters  Service      System
-        │     Checks       Agents
-        │       │              │
-        ▼       ▼              ▼
-  Prometheus Uptime Kuma   Netdata / Glances
-        │
-        ▼
-     Grafana
-        │
-        ▼
- Historical Dashboards
-
-Additional operational visibility:
-
-What's Up Docker ──► Container Update Status
-Speedtest Tracker ─► WAN Performance History
-
-                │
-                ▼
-            Homepage
-                │
-                ▼
-      Central Operational View
-```
+- **Infrastructure and services** generate metrics and health data.
+- **Prometheus** collects and stores time-series metrics.
+- **Grafana** visualizes historical metrics and trends.
+- **Uptime Kuma** monitors service availability.
+- **Netdata** and **Glances** provide real-time system visibility.
+- **What's Up Docker** tracks container image updates.
+- **Speedtest Tracker** records WAN performance.
+- **Homepage** aggregates operational status into a single dashboard.
 
 This architecture separates **metrics collection**, **visualization**, **availability monitoring**, and **operational dashboards** rather than forcing one application to perform every role.
 
