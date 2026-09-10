@@ -23,44 +23,13 @@ The current environment still operates primarily on a **single trusted LAN**, wh
 
 # Current Network Architecture
 
-At a high level, the current network follows this structure:
+![Current HomeLab Network Architecture](../diagrams/exported/network-architecture.svg)
 
-```text
-                         Internet
-                            │
-                            ▼
-                        TIM HUB+
-                     192.168.1.1
-                            │
-                      Home LAN
-                      192.168.1.0/24
-                            │
-            ┌───────────────┼───────────────┐
-            │               │               │
-            ▼               ▼               ▼
-      Proxmox Host      Client Devices    IoT Devices
-      192.168.1.69      PCs / Phones      Smart Home
-            │
-            │
-            ▼
-       Proxmox Bridge
-            │
-    ┌───────┼─────────────────────────────┐
-    │       │        │        │           │
-    ▼       ▼        ▼        ▼           ▼
-  HAOS   Jellyfin   Docker  Tailscale   Pi-hole
- VM 100   LXC 101  LXC 102   LXC 103    LXC 105
-    │
-    └────────────────────────────────────────────
-                            │
-                         LXC 104
-                         Homepage
+The current HomeLab operates primarily on a single `192.168.1.0/24` LAN behind the TIM HUB+ router.
 
-                         LXC 106
-                       WebApp Lab
-```
+The Proxmox host acts as the main infrastructure node and connects the virtualized workloads to the physical network through a Linux bridge.
 
-The Proxmox host provides the virtualization layer while the physical home router remains the main gateway between the LAN and the Internet.
+At the current stage, client devices, IoT devices, infrastructure services, and experimental workloads still share the same Layer-2 network. This keeps the environment simple to operate, but it also represents one of the main areas planned for future security improvement through VLAN-based segmentation.
 
 ---
 
