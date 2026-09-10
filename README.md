@@ -53,6 +53,8 @@ The project is designed as a practical learning environment where infrastructure
 
 The Lenovo ThinkCentre runs **Proxmox VE** as the main virtualization layer.
 
+![Proxmox VE Workloads](media/proxmox-workloads.png)
+
 Major workloads are deliberately separated based on their requirements.
 
 | ID | Workload | Type | Purpose |
