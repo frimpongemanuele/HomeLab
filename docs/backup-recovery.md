@@ -23,24 +23,36 @@ The environment currently uses multiple recovery mechanisms:
 
 The current backup strategy follows a layered approach.
 
-```text
-                         HomeLab
-                            │
-              ┌─────────────┴─────────────┐
-              │                           │
-         Proxmox VE                Home Assistant
-              │                           │
-       VM / LXC workloads          HA Backups
-              │                           │
-        Snapshot / Backup           Google Drive
-              │
-              ▼
-        External 3 TB HDD
-              │
-              └── /mnt/media/proxmox-backups
-```
+![HomeLab Backup and Recovery Architecture](../diagrams/exported/backup-architecture.svg)
 
-The external 3 TB HDD currently serves two purposes:
+The diagram shows both the **current backup implementation** and the **target architecture**.
+
+### Current Architecture
+
+The Proxmox host protects its workloads through multiple mechanisms:
+
+- **Home Assistant** creates application-level backups, with an off-host copy stored in Google Drive.
+- **Proxmox VM and LXC backups** are stored on the external 3 TB HDD.
+- **Infrastructure configuration** is maintained separately where appropriate, with sanitized configuration and documentation version-controlled through Git.
+- The external HDD currently contains both media and Proxmox backups.
+
+This creates an important shared failure domain:
+
+> The 3 TB HDD currently contains both primary media data and infrastructure backups. A physical failure of this disk could therefore affect both datasets.
+
+### Target Architecture
+
+The long-term objective is to separate the storage roles:
+
+```text
+Primary Storage
+      │
+      ▼
+Separate Backup Storage
+      │
+      ▼
+Off-site Copy
+```
 
 ```text
 /mnt/media
