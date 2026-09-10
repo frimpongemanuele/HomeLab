@@ -737,37 +737,53 @@ Future network segmentation should prevent this environment from freely accessin
 
 # Trust Boundaries
 
-The current HomeLab contains several logical trust boundaries.
+The HomeLab currently relies primarily on **logical trust boundaries** created through virtualization, containerization, application authentication, and VPN-based remote access.
+
+![HomeLab Security Architecture - Current and Target State](../diagrams/exported/security-architecture.svg)
+
+The diagram highlights the evolution of the security architecture.
+
+### Current State
+
+The current environment uses a primarily flat `192.168.1.0/24` LAN.
+
+Although workloads are separated through VMs, LXC containers, and Docker containers, infrastructure, services, IoT devices, and lab workloads still share the same underlying network.
+
+The main security boundaries currently come from:
+
+- VPN-based remote access
+- VM and LXC isolation
+- Docker container isolation
+- Application authentication
+- Private management interfaces
+- DNS filtering
+- Service-level access controls
+
+These controls reduce exposure, but they do not prevent all forms of lateral movement between systems on the LAN.
+
+### Target State
+
+The planned architecture introduces network-enforced trust boundaries using VLANs and inter-VLAN firewall policies.
+
+The target security zones are:
+
+- **Management** — Proxmox, administrative interfaces, and infrastructure management
+- **Services** — Jellyfin, Docker applications, dashboards, and internal services
+- **IoT** — smart-home and other embedded devices
+- **Lab** — experimental and security-testing workloads
+- **Guest** — untrusted or temporary client devices
+
+Traffic between these zones will be explicitly controlled by firewall policy rather than implicitly trusted.
+
+This represents the transition from:
 
 ```text
-                  Internet
-                     │
-            ─── Trust Boundary ───
-                     │
-                VPN Layer
-                     │
-            ─── Trust Boundary ───
-                     │
-                  Home LAN
-                     │
-        ┌────────────┼────────────┐
-        │            │            │
-   Management     Services       IoT
-        │            │            │
-        ▼            ▼            ▼
-     Proxmox       Docker       Devices
-        │
-   Virtualization Boundary
-        │
-   VM / LXC / Docker
-        │
-        ▼
-     Lab Workloads
+Logical workload isolation
+          ↓
+Network-enforced segmentation
+          ↓
+Least-privilege communication between zones
 ```
-
-Many of these trust boundaries are currently logical rather than enforced by dedicated VLANs and firewall rules.
-
-This is one of the most important limitations of the current security design.
 
 ---
 
