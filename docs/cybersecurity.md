@@ -4,21 +4,23 @@
 
 Security is a core design consideration of this HomeLab.
 
-The environment hosts multiple internal services, including virtualization infrastructure, smart home automation, media services, Docker workloads, file sharing, monitoring, and remote-access components.
+The environment hosts virtualization infrastructure, smart-home services, media applications, Docker workloads, DNS services, reverse-proxy infrastructure, file sharing, monitoring platforms, remote-access components, and a dedicated web-application testing environment.
 
-The objective is not to reproduce an enterprise security architecture in a residential environment, but to apply realistic cybersecurity principles such as:
+The goal is not to reproduce a full enterprise security architecture inside a residential network, but to apply realistic cybersecurity principles such as:
 
-* Reducing unnecessary exposure
-* Isolating workloads
-* Using authenticated remote access
-* Limiting reliance on public-facing services
-* Protecting administrative interfaces
-* Maintaining backup and rollback capabilities
-* Identifying attack surfaces and trust boundaries
-* Documenting security trade-offs
-* Gradually introducing segmentation, monitoring, and detection capabilities
+- Reducing unnecessary exposure
+- Isolating workloads
+- Protecting management interfaces
+- Using authenticated remote access
+- Applying least privilege where possible
+- Avoiding legacy protocols
+- Monitoring infrastructure health
+- Protecting recoverability through backups and snapshots
+- Identifying trust boundaries and attack surfaces
+- Documenting security trade-offs
+- Gradually introducing stronger segmentation and detection capabilities
 
-The current model is intentionally pragmatic: security controls are introduced where they provide meaningful value without making the environment unnecessarily complex.
+The current security model is intentionally pragmatic and continuously evolving.
 
 ---
 
@@ -29,18 +31,21 @@ The main security goals of the HomeLab are:
 1. Keep infrastructure management interfaces private.
 2. Avoid exposing administrative services directly to the public Internet.
 3. Use encrypted VPN-based remote access.
-4. Separate major workloads using VMs and containers.
+4. Separate major workloads using VMs, LXC containers, and Docker containers.
 5. Use authenticated access for shared resources.
-6. Reduce dependency on legacy or insecure protocols.
+6. Reduce dependency on obsolete or insecure protocols.
 7. Protect critical workloads with snapshots and backups.
-8. Maintain visibility into system availability and resource usage.
-9. Provide a platform for future security monitoring and network-security experimentation.
+8. Minimize privileges assigned to service integrations.
+9. Monitor infrastructure availability and abnormal resource behavior.
+10. Separate experimental workloads from stable infrastructure.
+11. Prepare the network for future VLAN-based segmentation.
+12. Build a realistic platform for defensive-security experimentation.
 
 ---
 
 # Current Security Architecture
 
-The HomeLab currently follows a **low-exposure architecture**.
+The HomeLab currently follows a **low-exposure, defense-in-depth model**.
 
 ```text
                     Internet
@@ -60,16 +65,22 @@ The HomeLab currently follows a **low-exposure architecture**.
                         ▼
                   Proxmox Host
                         │
-          ┌─────────────┼─────────────┐
-          │             │             │
-     Management      Services      Smart Home
-          │             │             │
-      Proxmox UI      Jellyfin        HAOS
-      Homepage        Docker
-                      Media Stack
+        ┌───────────────┼────────────────┐
+        │               │                │
+   Management        Services        Smart Home
+        │               │                │
+    Proxmox UI        Jellyfin           HAOS
+    Homepage          Docker
+    Monitoring        Media Stack
+        │
+        ├── Pi-hole
+        ├── Reverse Proxy
+        └── WebApp Lab
 ```
 
-Remote administrative access is performed through encrypted VPN connectivity rather than exposing internal management interfaces through conventional port forwarding.
+Remote administrative access is performed through encrypted VPN connectivity instead of direct public exposure.
+
+The current environment is primarily segmented through virtualization and service boundaries rather than dedicated network VLANs.
 
 ---
 
@@ -79,127 +90,193 @@ Remote administrative access is performed through encrypted VPN connectivity rat
 
 Remote access is provided through:
 
-* **Tailscale**
-* **WireGuard**
+- **Tailscale**
+- **WireGuard**
 
-Tailscale provides secure access to internal infrastructure without requiring inbound port-forwarding rules on the home router.
+Tailscale provides secure access to internal infrastructure without requiring inbound port forwarding.
 
 WireGuard is also available through the Home Assistant environment for remote connectivity.
 
-This approach significantly reduces exposure compared with directly publishing services such as:
+This reduces exposure compared with directly publishing services such as:
 
 ```text
-Proxmox    :8006
+Proxmox        :8006
 Home Assistant :8123
-Jellyfin   :8096
-SSH        :22
+Jellyfin       :8096
+SSH            :22
 ```
 
-to the Internet.
+to the public Internet.
 
-### Security Benefit
+### Security Benefits
 
-Without public port forwarding:
-
-* Internet-wide scanners cannot directly enumerate most internal services.
-* Administrative login pages remain inaccessible from arbitrary Internet hosts.
-* The attack surface exposed at the network perimeter is reduced.
-* Remote traffic is encrypted before reaching the internal environment.
+- Administrative login pages are not intentionally reachable from arbitrary Internet hosts.
+- Automated Internet scanners cannot directly enumerate most internal services.
+- Remote traffic is encrypted.
+- Public attack surface is reduced.
+- Remote-access control is separated from individual application authentication.
 
 ---
 
 ## 2. Private Management Interfaces
 
-Infrastructure administration is performed from the trusted LAN or through the VPN.
+Management interfaces remain on the private network or are accessed through the VPN layer.
 
 Examples include:
 
-* Proxmox administration interface
-* Home Assistant administration
-* Homepage dashboard
-* Docker application interfaces
-* Jellyfin administration
-* qBittorrent Web UI
-
-These services are not intentionally exposed directly to the public Internet.
+- Proxmox administration
+- Home Assistant administration
+- Homepage
+- Grafana
+- Prometheus
+- Pi-hole administration
+- Nginx Proxy Manager
+- Docker application interfaces
+- Jellyfin administration
+- qBittorrent Web UI
 
 The design principle is:
 
 ```text
 Internet
    │
-   ✕
+   X
 Direct Management Access
    │
    ▼
 VPN Authentication
    │
    ▼
-Internal Service
+Internal Management Interface
 ```
+
+This reduces unnecessary public exposure of administrative services.
 
 ---
 
 ## 3. Workload Isolation
 
-Different services are separated into dedicated virtualization environments.
+Different workloads are separated using dedicated virtualization environments.
 
 Current structure:
 
-| Workload         | Isolation     |
-| ---------------- | ------------- |
-| Home Assistant   | Dedicated VM  |
-| Jellyfin         | Dedicated LXC |
+| Workload | Isolation |
+|---|---|
+| Home Assistant | Dedicated VM |
+| Jellyfin | Dedicated LXC |
 | Docker workloads | Dedicated LXC |
-| Tailscale        | Dedicated LXC |
-| Homepage         | Dedicated LXC |
+| Tailscale | Dedicated LXC |
+| Homepage | Dedicated LXC |
+| Pi-hole | Dedicated LXC |
+| WebApp Lab | Dedicated LXC |
 
-This provides a useful isolation boundary between services.
+This provides useful isolation between different service categories.
 
-For example, compromise of a web application running inside the Docker host does not automatically mean that the attacker has direct access to the Home Assistant operating system or the Jellyfin container.
+For example, compromise of an experimental web application does not automatically provide direct filesystem access to the Home Assistant VM or Jellyfin container.
 
-However, LXC containers share the Proxmox host kernel and therefore do not provide the same isolation boundary as a full virtual machine.
+However, LXC containers share the Proxmox host kernel.
 
-This distinction is important when evaluating container security.
+Therefore:
+
+> **LXC isolation is useful, but it is not equivalent to the stronger kernel isolation provided by a full virtual machine.**
+
+This distinction is important when evaluating security boundaries.
 
 ---
 
-## 4. Proxmox API Authentication
+## 4. Dedicated WebApp Testing Environment
 
-Homepage retrieves infrastructure information from Proxmox through an API token rather than storing the primary interactive administrator password.
+LXC 106 is reserved for web-application development and security testing.
+
+This environment is considered higher-risk because workloads may be:
+
+- Under development
+- Intentionally misconfigured
+- Running experimental dependencies
+- Temporarily insecure
+- Used for vulnerability testing
+- Exposed to security-testing tools
+
+Separating this workload from stable services reduces the risk of testing activity affecting production-like infrastructure.
+
+A future improvement is to place this environment inside a dedicated **Lab VLAN** with restricted access to management and service networks.
+
+---
+
+## 5. Proxmox API Authentication
+
+Dashboard and monitoring integrations use API-based access rather than relying on the primary interactive administrator password.
 
 Conceptually:
 
 ```text
-Homepage
-    │
-    │ API Token
-    ▼
-Proxmox API
+Homepage / Exporter
+        │
+        ▼
+    API Token
+        │
+        ▼
+   Proxmox API
 ```
 
-Using API tokens makes credentials easier to separate, rotate, and revoke.
+API tokens provide better separation between interactive administrator access and application integrations.
 
-### Current Security Consideration
+The preferred model is:
 
-The security of this integration depends on the permissions assigned to the token.
-
-A future improvement is to ensure that dashboard integrations use:
-
-* A dedicated service account
-* A dedicated API token
-* Read-only permissions
-* The minimum required privileges
+- Dedicated service account
+- Dedicated API token
+- Read-only role where possible
+- Minimum required privileges
+- Independent revocation and rotation
 
 This follows the principle of least privilege.
 
 ---
 
-## 5. Authenticated Samba Access
+## 6. DNS Filtering with Pi-hole
 
-The media storage is exposed to Windows clients using Samba.
+Pi-hole provides centralized DNS-level filtering.
 
-Anonymous guest access was replaced with an authenticated Samba user.
+Its primary purpose is advertisement and tracker blocking, but it also contributes to security by:
+
+- Blocking selected known malicious domains
+- Reducing unwanted outbound requests
+- Providing DNS query visibility
+- Helping identify unusual DNS behavior
+- Allowing centralized domain policy
+
+Conceptually:
+
+```text
+Client
+   │
+   ▼
+Pi-hole
+   │
+   ├── Blocked Domain ──► DENY
+   │
+   └── Allowed Domain
+           │
+           ▼
+      Upstream DNS
+```
+
+Pi-hole is not treated as a replacement for:
+
+- Firewalls
+- IDS/IPS
+- Endpoint protection
+- Network segmentation
+
+Instead, it provides another layer within the overall defense-in-depth model.
+
+---
+
+## 7. Authenticated Samba Access
+
+The media storage is shared to Windows systems through Samba.
+
+Anonymous guest access was replaced with a dedicated Samba user.
 
 Example:
 
@@ -208,31 +285,51 @@ adduser mediauser
 smbpasswd -a mediauser
 ```
 
-The share requires:
+The share uses authenticated access:
 
 ```ini
 valid users = mediauser
 ```
 
-This prevents completely unauthenticated access to the media share.
+This prevents unauthenticated clients from accessing the share.
 
 ---
 
-## 6. SMB1 Disabled
+## 8. SMB1 Disabled
 
-SMB1 was briefly enabled during troubleshooting but was later identified as unnecessary and insecure.
+SMB1 was briefly considered during troubleshooting but was not required.
 
 The final design avoids SMB1 and relies on modern SMB versions.
 
-This reduces exposure to a legacy protocol associated with well-known historical vulnerabilities and poor security properties.
+This removes dependence on a legacy protocol with poor security properties and a long history of serious vulnerabilities.
 
 ---
 
-## 7. Snapshot-Based Change Protection
+## 9. Reverse Proxy Layer
+
+Nginx Proxy Manager provides reverse-proxy functionality for selected internal applications.
+
+This allows services to be accessed through centralized routing rather than exposing every backend directly by IP and port.
+
+Potential benefits include:
+
+- Centralized TLS termination
+- Consistent internal hostnames
+- Certificate management
+- Reduced direct interaction with application ports
+- Additional access-control opportunities
+
+However:
+
+> **A reverse proxy is not a firewall and does not automatically secure the backend application.**
+
+Backend services still require authentication, patching, and appropriate network access controls.
+
+---
+
+## 10. Snapshot-Based Change Protection
 
 Before significant infrastructure changes, snapshots are used where appropriate.
-
-Workflow:
 
 ```text
 Create Snapshot
@@ -252,11 +349,16 @@ Remove Rollback
 Snapshot
 ```
 
-Snapshots are not backups, but they provide useful protection against configuration mistakes and failed upgrades.
+Snapshots are not backups, but they provide fast recovery from:
+
+- Failed upgrades
+- Broken configuration changes
+- Service regressions
+- Administrative mistakes
 
 ---
 
-## 8. Backup Strategy
+## 11. Backup Strategy
 
 The HomeLab currently uses multiple backup mechanisms.
 
@@ -264,13 +366,11 @@ The HomeLab currently uses multiple backup mechanisms.
 
 Home Assistant backups are copied to Google Drive.
 
-This provides an off-site recovery copy for one of the most important services in the environment.
+This provides an off-site recovery location.
 
 ### Proxmox
 
-VMs and LXC containers are backed up to the external HDD.
-
-Current location:
+VMs and LXC containers are backed up to:
 
 ```text
 /mnt/media/proxmox-backups
@@ -278,60 +378,99 @@ Current location:
 
 ### Security Benefit
 
-Backups provide resilience against:
+Backups improve resilience against:
 
-* Configuration mistakes
-* Failed updates
-* VM/container corruption
-* Accidental deletion
-* Some forms of ransomware or destructive activity
+- Configuration mistakes
+- Failed updates
+- Container corruption
+- Accidental deletion
+- Some ransomware scenarios
+- Storage incidents
 
-However, the current local backup architecture has an important limitation:
+### Current Limitation
 
-> Media files and Proxmox backups currently reside on the same physical 3 TB HDD.
+Media files and Proxmox backups currently reside on the same physical 3 TB HDD.
 
-Therefore, physical disk failure would affect both datasets.
+This creates a shared failure domain.
 
-Separating the backup destination from the media storage is a planned improvement.
+A future improvement is to move infrastructure backups to independent storage.
+
+---
+
+## 12. Monitoring and Observability
+
+The HomeLab includes:
+
+- Prometheus
+- Grafana
+- Uptime Kuma
+- Netdata
+- Glances
+- What's Up Docker
+- Speedtest Tracker
+- Homepage
+
+These tools primarily provide operational monitoring rather than full security detection.
+
+They can still help identify abnormal conditions such as:
+
+- Unexpected CPU spikes
+- Sudden memory growth
+- Excessive disk activity
+- Unusual network utilization
+- Repeated service failures
+- Container restart loops
+- Storage exhaustion
+
+This telemetry provides useful context during troubleshooting and incident analysis.
+
+More details are documented in:
+
+[Monitoring & Observability](monitoring.md)
 
 ---
 
 # Threat Model
 
-The HomeLab is primarily exposed to threats originating from:
+The HomeLab is primarily designed to mitigate realistic threats relevant to self-hosted infrastructure.
 
-* The local network
-* Compromised IoT devices
-* Vulnerable self-hosted applications
-* Misconfiguration
-* Weak or leaked credentials
-* Malicious or compromised Docker containers
-* Supply-chain vulnerabilities
-* Untrusted downloaded content
-* Administrative mistakes
-* Storage or hardware failure
+Potential threat sources include:
 
-The environment is not designed to defend against a highly resourced targeted attacker.
+- Internet-based scanning
+- Vulnerable self-hosted applications
+- Compromised IoT devices
+- Malicious or compromised Docker containers
+- Weak or leaked credentials
+- Untrusted downloaded content
+- Supply-chain vulnerabilities
+- Misconfiguration
+- Administrative mistakes
+- Malware or ransomware on client systems
+- Storage or hardware failure
 
-Instead, the security model focuses on realistic threats relevant to self-hosted infrastructure.
+The environment is not designed to resist a highly resourced targeted attacker.
+
+The goal is to reduce common attack paths, limit impact, and improve recovery capability.
 
 ---
 
-## Threat Scenarios
+# Threat Scenarios
 
-| Threat                 | Example                                      | Current Mitigation                                      |
-| ---------------------- | -------------------------------------------- | ------------------------------------------------------- |
-| Internet scanning      | Automated scanner searches for Proxmox or HA | No direct port forwarding                               |
-| Credential attack      | Brute-force attempt against management UI    | VPN-only remote access                                  |
-| Compromised service    | Vulnerable Docker application                | Workload isolation                                      |
-| Compromised IoT device | IoT device attempts lateral movement         | Service separation; VLAN segmentation planned           |
-| Legacy protocol attack | SMB1 exploitation                            | SMB1 disabled                                           |
-| Credential leakage     | Dashboard integration token exposed          | API tokens used; secrets excluded from Git              |
-| Failed update          | Service becomes unusable                     | Snapshot / rollback workflow                            |
-| Storage failure        | External HDD becomes unavailable             | Backups exist, but local single-disk dependency remains |
-| Malware/ransomware     | Writable SMB share targeted                  | Authenticated access; stronger isolation planned        |
-| Container compromise   | Web app gains shell inside container         | Dedicated Docker LXC                                    |
-| Administrative mistake | Wrong disk formatted or mount misconfigured  | Backup/recovery process and read-only-first lessons     |
+| Threat | Example | Current Mitigation |
+|---|---|---|
+| Internet scanning | Scanner searches for Proxmox or HA | No intentional public admin exposure |
+| Credential attack | Brute-force attempt against management UI | VPN-only remote administration |
+| Vulnerable web app | Exploitable test application | Dedicated WebApp LXC |
+| Compromised Docker service | Container vulnerability | Dedicated Docker LXC |
+| Compromised IoT device | Lateral movement attempt | Virtual workload separation; VLANs planned |
+| DNS-based threat | Client resolves malicious domain | Pi-hole filtering |
+| Legacy protocol attack | SMB1 exploitation | SMB1 disabled |
+| Credential leakage | API token exposed | Separate API tokens and secrets excluded from Git |
+| Failed update | Service becomes unavailable | Snapshot and rollback workflow |
+| Storage failure | External HDD fails | Backups exist, but shared disk remains a limitation |
+| Malware / ransomware | Writable SMB share targeted | Authenticated access; stronger segmentation planned |
+| Supply-chain issue | Compromised container image | Controlled updates and trusted images |
+| Administrative mistake | Wrong disk or config modified | Backup/recovery procedures and read-only-first policy |
 
 ---
 
@@ -341,107 +480,118 @@ Instead, the security model focuses on realistic threats relevant to self-hosted
 
 ### Potential Risks
 
-* Administrative interface compromise
-* Weak credentials
-* Excessive API token permissions
-* SSH exposure
-* Hypervisor vulnerabilities
+- Administrative interface compromise
+- Weak administrator credentials
+- Excessive API permissions
+- SSH exposure
+- Hypervisor vulnerabilities
+- Compromise of the host affecting all workloads
 
 ### Current Mitigations
 
-* Management interface kept internal
-* Remote access through VPN
-* API token support for integrations
-* No intended public exposure
+- Management interface kept private
+- Remote access through VPN
+- API-token integrations
+- No intentional public exposure
+- Backups and snapshots
 
 ### Planned Improvements
 
-* Dedicated management VLAN
-* Restrict access to trusted administrator devices
-* Least-privilege API accounts
-* More centralized logging
+- Dedicated Management VLAN
+- Restrict access to trusted administrator systems
+- Stronger least-privilege API accounts
+- Centralized authentication/security logging
+- More granular firewall policy
 
 ---
 
-## Home Assistant
+# Home Assistant
 
-Home Assistant is a particularly sensitive component because it interacts with physical devices.
+Home Assistant is particularly sensitive because it controls physical devices and automation.
 
 A compromise could potentially affect:
 
-* Lights
-* Switches
-* Sensors
-* Automation logic
-* Zigbee devices
-* Other integrated smart-home systems
+- Lights
+- Switches
+- Sensors
+- Automation logic
+- Zigbee devices
+- Integrated smart-home systems
 
 ### Current Mitigations
 
-* Dedicated virtual machine
-* No unnecessary public exposure
-* VPN-based access
-* Independent backups to Google Drive
+- Dedicated VM
+- Private management interface
+- VPN-based remote access
+- Independent Google Drive backups
 
 ### Planned Improvements
 
-* Place IoT devices into a dedicated VLAN
-* Restrict IoT-to-LAN communication
-* Explicit firewall rules between IoT and management networks
+- Dedicated IoT VLAN
+- Restrict IoT-to-management communication
+- Explicit firewall rules
+- Improved IoT monitoring
 
 ---
 
-## Jellyfin
+# Jellyfin
 
-Potential attack surface includes:
+Potential attack surfaces include:
 
-* Web interface
-* Media parsing
-* Plugins
-* User authentication
-* Uploaded/downloaded media content
+- Web interface
+- User authentication
+- Plugins
+- Media parsing
+- Downloaded media files
+- GPU device access
 
 ### Current Mitigations
 
-* Dedicated LXC
-* No direct administrative exposure
-* Media data separated from Jellyfin system files
-* Hardware access limited to required GPU devices
+- Dedicated LXC
+- No intentional direct public administration
+- Media separated from system files
+- GPU access limited to required `/dev/dri` devices
 
 ---
 
-## Docker Host
+# Docker Host
 
-The Docker LXC contains several independently maintained applications.
+The Docker LXC contains multiple independently maintained applications, including:
 
-This increases the overall application attack surface.
+- Sonarr
+- Radarr
+- Prowlarr
+- Bazarr
+- qBittorrent
+- Jellyseerr
+- Dispatcharr
+- Nginx Proxy Manager
+- Prometheus
+- Grafana
+- Uptime Kuma
+- Netdata
+- Glances
+- What's Up Docker
+- Speedtest Tracker
 
-Current workloads include:
-
-* Radarr
-* Sonarr
-* Prowlarr
-* Bazarr
-* qBittorrent
-
-A vulnerability in any of these services could provide an attacker with access to the Docker environment.
+This significantly increases application-level attack surface.
 
 ### Current Mitigation
 
-Docker workloads are placed inside a dedicated LXC rather than directly on the Proxmox host.
+Docker workloads run inside a dedicated LXC rather than directly on the Proxmox host.
 
-### Important Security Trade-Off
+### Security Trade-Off
 
-Docker runs inside LXC with additional permissions required for nested containerization.
+Docker inside LXC requires additional capabilities.
 
-The configuration includes:
+Configuration includes:
 
 ```text
 features: nesting=1,keyctl=1
 lxc.apparmor.profile: unconfined
 ```
 
-and, for some Docker containers:
+and some Docker containers may use:
 
 ```yaml
 security_opt:
@@ -450,32 +600,25 @@ security_opt:
 
 This reduces AppArmor confinement.
 
-It solved compatibility issues with Docker inside LXC, but it also weakens one layer of host-side isolation.
+It solved Docker compatibility problems, but weakens one layer of isolation.
 
-This is therefore documented as a conscious security trade-off rather than being treated as a neutral configuration change.
+### Future Improvement
 
-### Possible Future Improvement
-
-If stronger isolation becomes a priority, the Docker environment could be migrated to:
-
-* A dedicated VM
-
-rather than Docker inside an LXC container.
-
-That would provide a stronger kernel isolation boundary.
+Higher-risk Docker workloads could be moved to a dedicated VM to provide stronger kernel isolation.
 
 ---
 
-## qBittorrent
+# qBittorrent
 
-The download client represents a higher-risk workload because it processes data obtained from external peers.
+qBittorrent represents a higher-risk workload because it processes data from external peers.
 
 Potential risks include:
 
-* Malicious files
-* Vulnerable Web UI
-* Network exposure
-* Untrusted peer traffic
+- Malicious files
+- Vulnerable Web UI
+- Untrusted peer traffic
+- Accidental exposure
+- Excessive access to shared storage
 
 The intended future design is:
 
@@ -486,85 +629,231 @@ qBittorrent
 Gluetun
      │
      ▼
-Commercial VPN Provider
+Commercial VPN
      │
      ▼
 Internet
 ```
 
-Only download traffic should use the privacy VPN.
+Only downloader traffic should use the privacy VPN.
 
-Home Assistant, Proxmox, Jellyfin, and other internal services should not be routed through this tunnel.
+Management services such as Home Assistant, Proxmox, Jellyfin, and monitoring systems should not be routed through this tunnel.
 
 ---
 
-## Samba
-
-The Samba share provides read/write access to the shared media disk.
+# Nginx Proxy Manager
 
 Potential risks include:
 
-* Credential theft
-* Malware modifying media
-* Ransomware encrypting writable files
-* Excessively permissive filesystem permissions
+- Misconfigured proxy hosts
+- Improper TLS configuration
+- Administrative interface compromise
+- Accidental exposure of internal services
 
-Current configuration uses authenticated access.
+### Current Mitigation
 
-However, the exFAT filesystem requires simplified ownership semantics.
+The service is used primarily for internal routing and is not considered a replacement for network access control.
 
-The current mount configuration uses:
+### Planned Improvements
+
+- Internal HTTPS expansion
+- Certificate monitoring
+- Stronger access restrictions
+- Segmentation between proxy and management services
+
+---
+
+# Pi-hole
+
+Potential risks include:
+
+- Administrative interface compromise
+- DNS manipulation
+- Incorrect upstream configuration
+- DNS service outage affecting clients
+
+### Current Mitigations
+
+- Dedicated LXC
+- Separation from Docker
+- Private network placement
+- Centralized DNS management
+
+---
+
+# Samba
+
+Potential risks include:
+
+- Credential theft
+- Malware modifying files
+- Ransomware encrypting writable shares
+- Overly permissive permissions
+
+The exFAT media disk currently uses:
 
 ```text
 umask=000
 ```
 
-which makes filesystem permissions very permissive at the Linux level.
+This provides very permissive filesystem access at the Linux level.
 
-Access is therefore largely controlled at the Samba/service layer rather than through traditional Unix file permissions.
+Access is therefore controlled mainly through Samba authentication rather than Unix filesystem permissions.
 
-This is acceptable for the current portability-focused design but is not ideal from a least-privilege perspective.
+This is acceptable for the current portability-focused storage design, but is not ideal for strict least-privilege enforcement.
 
-A future dedicated NAS or Linux-native storage system would allow more granular access control.
+A dedicated NAS or Linux-native filesystem would allow more granular access control in the future.
+
+---
+
+# WebApp Lab
+
+The WebApp LXC is intentionally treated as a higher-risk trust zone.
+
+Potential risks include:
+
+- Vulnerable frameworks
+- Remote code execution
+- Weak authentication
+- Development interfaces
+- Vulnerable dependencies
+- SSRF
+- File-upload vulnerabilities
+- Command injection
+- SQL injection
+- Cross-site scripting
+
+The environment can be used for controlled testing without deliberately weakening production-like services.
+
+Future network segmentation should prevent this environment from freely accessing:
+
+- Proxmox management
+- Home Assistant
+- Pi-hole administration
+- Backup storage
+- Other sensitive services
 
 ---
 
 # Trust Boundaries
 
-The HomeLab currently contains several logical trust boundaries.
+The current HomeLab contains several logical trust boundaries.
 
 ```text
-                   Internet
-                      │
-              ───── Trust Boundary ─────
-                      │
-                 VPN Layer
-                      │
-              ───── Trust Boundary ─────
-                      │
-                   Home LAN
-                      │
-          ┌───────────┴────────────┐
-          │                        │
-     Management                IoT / Clients
-          │                        │
-          ▼                        ▼
-       Proxmox                 Smart Devices
-          │
-    ─── Virtualization Boundary ───
-          │
-     VM / LXC / Docker
+                  Internet
+                     │
+            ─── Trust Boundary ───
+                     │
+                VPN Layer
+                     │
+            ─── Trust Boundary ───
+                     │
+                  Home LAN
+                     │
+        ┌────────────┼────────────┐
+        │            │            │
+   Management     Services       IoT
+        │            │            │
+        ▼            ▼            ▼
+     Proxmox       Docker       Devices
+        │
+   Virtualization Boundary
+        │
+   VM / LXC / Docker
+        │
+        ▼
+     Lab Workloads
 ```
 
-At present, many of these boundaries are logical rather than enforced through dedicated VLANs.
+Many of these trust boundaries are currently logical rather than enforced by dedicated VLANs and firewall rules.
 
-Implementing network segmentation is therefore one of the main planned security improvements.
+This is one of the most important limitations of the current security design.
+
+---
+
+# Current Limitation: Flat LAN
+
+The HomeLab still primarily operates on:
+
+```text
+192.168.1.0/24
+```
+
+This means systems with different trust levels can share the same Layer-2 network.
+
+Examples include:
+
+- Infrastructure management
+- User devices
+- IoT devices
+- Media services
+- Experimental workloads
+
+Virtualization isolation does not automatically provide network isolation.
+
+This is why VLAN segmentation is one of the highest-priority future improvements.
+
+---
+
+# Planned Network Segmentation
+
+The target architecture introduces five trust zones:
+
+```text
+Management VLAN
+Services VLAN
+IoT VLAN
+Lab VLAN
+Guest VLAN
+```
+
+A future topology could look like:
+
+```text
+                     Router / Firewall
+                           │
+        ┌──────────────────┼──────────────────┐
+        │                  │                  │
+        ▼                  ▼                  ▼
+  Management VLAN     Services VLAN       IoT VLAN
+        │                  │                  │
+    Proxmox             Jellyfin          Smart Home
+    Monitoring          Docker Apps       IoT Devices
+
+        ┌──────────────────┴──────────────────┐
+        │                                     │
+        ▼                                     ▼
+     Lab VLAN                            Guest VLAN
+        │                                     │
+   WebApp Testing                        Guest Devices
+```
+
+---
+
+# Example Firewall Policy
+
+The target policy follows a default-deny model between zones.
+
+| Source | Destination | Policy |
+|---|---|---|
+| Management | Internal services | Allow required administration |
+| Services | Management | Deny by default |
+| IoT | Management | Deny |
+| IoT | Home Assistant | Allow required protocols |
+| IoT | Internet | Allow required outbound |
+| Lab | Management | Deny |
+| Lab | Services | Deny by default |
+| Guest | Internal networks | Deny |
+| Guest | Internet | Allow |
+| VPN | Management | Allow authenticated administration |
+
+This would significantly reduce lateral movement opportunities.
 
 ---
 
 # Secrets Management
 
-Sensitive values should never be committed to the public repository.
+Sensitive values must not be committed to the public repository.
 
 Examples include:
 
@@ -576,10 +865,13 @@ WireGuard private keys
 Jellyfin API keys
 Home Assistant tokens
 Samba passwords
+VPN credentials
 Cloud API credentials
 ```
 
-Configuration examples in the repository should use placeholders:
+Public configuration examples should use placeholders.
+
+Example:
 
 ```env
 PROXMOX_API_TOKEN=REDACTED
@@ -588,146 +880,126 @@ HOME_ASSISTANT_TOKEN=REDACTED
 TAILSCALE_AUTH_KEY=REDACTED
 ```
 
-Where possible, `.env` files containing real credentials should be excluded through `.gitignore`.
+Real `.env` files should be excluded through `.gitignore`.
 
 Future improvements may include:
 
-* SOPS
-* Ansible Vault
-* Docker secrets
-* Dedicated secret-management platforms
+- SOPS
+- Ansible Vault
+- Docker secrets
+- Dedicated secret-management platforms
 
 ---
 
-# Security Monitoring
+# Container Supply-Chain Security
 
-The HomeLab includes or is being expanded with monitoring services such as:
+Docker introduces software supply-chain considerations.
 
-* Prometheus
-* Grafana
-* Uptime Kuma
-* Proxmox metrics
-* Jellyfin metrics
-* Home Assistant metrics
+Potential risks include:
 
-These primarily provide availability and performance monitoring.
+- Compromised upstream images
+- Outdated base images
+- Vulnerable dependencies
+- Malicious image updates
 
-They should not be confused with security monitoring.
+The current approach includes:
 
-The next stage is to introduce security-focused telemetry.
+- Using trusted or well-maintained images
+- Monitoring updates through What's Up Docker
+- Reviewing updates before deployment
+- Avoiding blind automatic updates
+- Keeping persistent configuration separate from container images
 
-Potential tools include:
+Future improvements may include container image vulnerability scanning.
 
-### Wazuh
+---
 
-Possible uses:
+# Monitoring vs Security Monitoring
 
-* Host intrusion detection
-* File integrity monitoring
-* Security event collection
-* Vulnerability information
-* Centralized alerts
+The current observability stack provides:
 
-### Suricata
+- Metrics
+- Availability monitoring
+- Resource trends
+- Network-performance visibility
+- Container-update visibility
 
-Possible uses:
+These capabilities support security investigations, but they are not a SIEM or IDS.
 
-* Network intrusion detection
-* Traffic inspection
-* Signature-based detection
-* Network telemetry
+Security monitoring requires additional telemetry such as:
 
-### Centralized Logging
+```text
+Authentication logs
+Firewall logs
+DNS logs
+Reverse proxy logs
+Linux audit events
+Application logs
+IDS alerts
+```
 
-Possible platforms:
+The distinction is deliberate:
 
-* Grafana Loki
-* Graylog
-* Elastic Stack
+> **Operational monitoring helps identify abnormal behavior; security monitoring helps identify malicious behavior.**
 
-Potential log sources:
+---
+
+# Planned Security Monitoring
+
+## Wazuh
+
+Potential use cases include:
+
+- Host intrusion detection
+- File-integrity monitoring
+- Log collection
+- Security event correlation
+- Vulnerability information
+- Centralized alerting
+
+## Suricata
+
+Potential use cases include:
+
+- Network intrusion detection
+- Traffic inspection
+- Signature-based detection
+- Network telemetry
+
+## Centralized Logging
+
+Possible platforms include:
+
+- Grafana Loki
+- Graylog
+- Elastic Stack
+
+Potential log sources include:
 
 ```text
 Proxmox
 Linux authentication
 Docker
 Tailscale
+Pi-hole
 Home Assistant
 Samba
-Reverse proxy
+Nginx Proxy Manager
 Firewall
 ```
 
 ---
 
-# Planned Network Segmentation
-
-The current HomeLab primarily operates on a single home LAN.
-
-One of the most important future security improvements is VLAN-based segmentation.
-
-The planned architecture is:
-
-```text
-                    Router / Firewall
-                          │
-            ┌─────────────┼─────────────┐
-            │             │             │
-            ▼             ▼             ▼
-      Management       Services        IoT
-        VLAN              VLAN         VLAN
-            │             │             │
-        Proxmox         Jellyfin     Smart Devices
-        Admin PC        Docker       Hue Bridge
-        Homepage        Media        Zigbee Gateway
-
-                          │
-                          ▼
-                     Guest VLAN
-```
-
-Possible VLAN roles:
-
-| VLAN       | Purpose                                   |
-| ---------- | ----------------------------------------- |
-| Management | Proxmox and administrative interfaces     |
-| Services   | Jellyfin, Docker applications, dashboards |
-| IoT        | Smart-home devices                        |
-| Guest      | Untrusted client devices                  |
-
----
-
-## Example Firewall Policy
-
-The future policy would follow a deny-by-default model between security zones.
-
-Example:
-
-```text
-Admin PC → Management VLAN      ALLOW
-Management → IoT                ALLOW only required flows
-IoT → Management                DENY
-Guest → Management              DENY
-Guest → IoT                     DENY
-IoT → Internet                  ALLOW where required
-Internet → Management           DENY
-VPN → Management                ALLOW authenticated devices
-```
-
-This would significantly reduce lateral movement opportunities if an IoT or guest device were compromised.
-
----
-
 # Defense-in-Depth Strategy
 
-The long-term security model uses multiple layers:
+The long-term security model uses multiple layers.
 
 ```text
 Layer 1
 No unnecessary Internet exposure
 
 Layer 2
-VPN authentication
+VPN-based remote access
 
 Layer 3
 Network segmentation
@@ -742,163 +1014,143 @@ Layer 6
 Application authentication
 
 Layer 7
-Least-privilege credentials
+Least-privilege service accounts
 
 Layer 8
-Logging and monitoring
+DNS filtering
 
 Layer 9
-Snapshots and backups
+Monitoring and logging
 
 Layer 10
+Snapshots and backups
+
+Layer 11
 Recovery procedures
 ```
 
-No individual security control is assumed to be perfect.
+No individual control is considered sufficient on its own.
 
-The goal is to make compromise more difficult, reduce lateral movement, and improve the ability to detect and recover from incidents.
+The objective is to:
 
----
-
-# Known Security Limitations
-
-The current environment has several known limitations.
-
-### Single LAN
-
-Most devices currently share the same network.
-
-This increases the potential for lateral movement.
-
-**Planned mitigation:** VLAN segmentation.
-
----
-
-### Single Proxmox Node
-
-The entire virtualized environment depends on one physical host.
-
-This is primarily an availability risk.
-
-**Possible future mitigation:** secondary node or improved recovery automation.
-
----
-
-### Shared Media and Backup Disk
-
-Media and Proxmox backups currently reside on the same physical HDD.
-
-This does not provide physical failure isolation.
-
-**Planned mitigation:** dedicated backup storage.
-
----
-
-### Docker AppArmor Relaxation
-
-Docker inside LXC requires relaxed AppArmor restrictions.
-
-**Possible future mitigation:** migrate Docker workloads to a VM.
-
----
-
-### Permissive exFAT Permissions
-
-The portable exFAT media drive does not provide Linux-native access-control semantics.
-
-**Possible future mitigation:** dedicated NAS or Linux-native filesystem with controlled SMB exports.
-
----
-
-### Limited Security Telemetry
-
-Performance monitoring exists, but SIEM/IDS capabilities are not yet fully implemented.
-
-**Planned mitigation:** Wazuh, Suricata, and centralized logging.
+- Reduce initial compromise opportunities
+- Limit lateral movement
+- Reduce privilege escalation paths
+- Improve visibility
+- Preserve recovery options
 
 ---
 
 # Security Roadmap
 
-Planned improvements are prioritized approximately as follows:
+## Phase 1 — Network Segmentation
 
-### Phase 1 — Network Segmentation
+- Management VLAN
+- Services VLAN
+- IoT VLAN
+- Lab VLAN
+- Guest VLAN
+- Inter-VLAN firewall rules
 
-* Management VLAN
-* Services VLAN
-* IoT VLAN
-* Guest VLAN
-* Inter-VLAN firewall rules
+## Phase 2 — Access Hardening
 
-### Phase 2 — Access Hardening
+- Dedicated service accounts
+- Least-privilege API tokens
+- Restrict Proxmox management access
+- Review SSH access
+- Internal HTTPS expansion
+- Certificate monitoring
 
-* Dedicated service accounts
-* Least-privilege API tokens
-* Restrict Proxmox management access
-* Review SSH authentication
-* Review administrative accounts
+## Phase 3 — Monitoring and Detection
 
-### Phase 3 — Monitoring and Detection
+- Centralized logging
+- Wazuh
+- Suricata
+- Security dashboards
+- Alerting
+- Authentication-event monitoring
 
-* Centralized log collection
-* Wazuh deployment
-* Suricata testing
-* Security dashboards
-* Alerting
+## Phase 4 — Storage and Backup Hardening
 
-### Phase 4 — Storage and Backup Hardening
+- Separate backup storage
+- Encrypted off-site backups
+- Restore testing
+- Automated configuration backups
+- Reduced writable exposure
 
-* Separate backup disk
-* Encrypted off-site backups
-* Restore testing
-* Automated configuration backups
+## Phase 5 — Application Security
 
-### Phase 5 — Infrastructure Automation
+- WebApp lab expansion
+- OWASP Top 10 testing
+- Controlled vulnerability scanning
+- Reverse-proxy hardening
+- Docker image scanning
+- Container capability review
 
-* Ansible deployment
-* Version-controlled configurations
-* Secret management
-* Automated compliance checks
+## Phase 6 — Infrastructure Automation
+
+- Ansible deployment
+- Version-controlled configuration
+- Secret management
+- Automated compliance checks
 
 ---
 
 # Security Lessons Learned
 
-Several practical lessons emerged during the construction of this HomeLab.
+## Minimize Exposure
 
-### Minimize Exposure
+A service that does not need to be publicly reachable should remain private.
 
-A service that does not need to be publicly reachable should not be publicly reachable.
+VPN access provides a safer administrative path than unnecessary port forwarding.
 
-VPN-based access provides a practical alternative to exposing administrative interfaces.
+---
 
-### Isolation Has Levels
+## Isolation Has Different Levels
 
-VMs, LXC containers, and Docker containers do not provide equivalent security boundaries.
+VMs, LXCs, and Docker containers do not provide equivalent security boundaries.
 
-Understanding where the kernel boundary exists is important when designing isolation.
+Understanding the kernel boundary is critical when evaluating isolation.
 
-### Compatibility Changes Can Reduce Security
+---
 
-Disabling AppArmor restrictions solved Docker compatibility problems, but it also reduced confinement.
+## Compatibility Changes Can Reduce Security
+
+Relaxing AppArmor solved Docker compatibility issues, but reduced confinement.
 
 Security trade-offs should be explicitly documented.
 
-### Backups Must Have Independent Failure Domains
+---
 
-A backup stored on the same physical disk as the data it protects does not protect against disk failure.
+## Experimental Workloads Need Their Own Trust Zone
 
-### Recovery Is Part of Security
+The WebApp environment reinforces the need to separate development and testing workloads from stable services.
 
-The storage incident demonstrated that security is not limited to preventing malicious activity.
+---
 
-Operational mistakes, data corruption, failed mounts, and incorrect disk operations can have consequences similar to a security incident.
+## DNS Can Provide Useful Security Visibility
 
-Recovery procedures are therefore part of the overall resilience strategy.
+DNS activity can reveal unexpected outbound communication even without full packet inspection.
 
-### Read-Only First
+---
 
-Before modifying unknown or important storage devices:
+## Backups Need Independent Failure Domains
+
+A backup stored on the same physical disk as production data does not protect against disk failure.
+
+---
+
+## Recovery Is Part of Security
+
+The storage incident demonstrated that resilience is not only about malicious threats.
+
+Operational mistakes can have consequences similar to security incidents.
+
+---
+
+## Read-Only First
+
+Before modifying important storage:
 
 ```bash
 lsblk
@@ -907,7 +1159,7 @@ blkid
 fdisk -l
 ```
 
-and, where possible, mount the filesystem read-only before performing destructive operations.
+and, where possible, mount the target filesystem read-only.
 
 Destructive commands such as:
 
@@ -918,24 +1170,62 @@ fdisk write
 gdisk write
 ```
 
-should only be used after verifying the target device and confirming that the existing data is disposable.
+should only be used after confirming the target disk and verifying that existing data is disposable.
 
 ---
 
-# Conclusion
+# Current Security Limitations
 
-The HomeLab currently follows a pragmatic security model centered around:
+The current environment still has several known limitations:
 
-* Minimal public exposure
-* VPN-based remote access
-* Workload separation
-* Authenticated services
-* Backup and rollback capabilities
-* Awareness of infrastructure attack surfaces
-* Explicit documentation of security trade-offs
+- Flat LAN
+- No inter-VLAN firewalling yet
+- Single Proxmox host
+- Shared media and backup disk
+- Docker inside LXC with relaxed AppArmor
+- Permissive exFAT filesystem permissions
+- No SIEM yet
+- No IDS/IPS yet
+- Limited centralized logging
+- Experimental workloads still share the main LAN
+
+These limitations are intentionally documented because they define the next stage of the HomeLab security roadmap.
+
+---
+
+# Key Takeaways
+
+The current HomeLab security architecture demonstrates practical experience with:
+
+- Attack-surface reduction
+- VPN-based access
+- Workload isolation
+- Hypervisor security considerations
+- LXC and Docker security trade-offs
+- DNS filtering
+- Reverse-proxy security
+- API-token management
+- SMB hardening
+- Secrets hygiene
+- Threat modeling
+- Trust boundaries
+- Network segmentation planning
+- Backup and recovery
+- Security monitoring design
+- Web-application security experimentation
 
 The environment is not presented as fully hardened or enterprise-grade.
 
-Instead, it serves as an evolving platform where security controls can be designed, implemented, tested, monitored, and improved over time.
+Instead, it is documented as an evolving infrastructure platform where security controls can be designed, implemented, tested, monitored, and improved over time.
 
-The next major milestone is **network segmentation and security monitoring**, which will introduce stronger trust boundaries and provide the telemetry required for more advanced defensive-security experimentation.
+---
+
+## Related Documentation
+
+- [Architecture](architecture.md)
+- [Networking](networking.md)
+- [Monitoring & Observability](monitoring.md)
+- [Docker & Media Stack](docker-media-stack.md)
+- [Home Assistant](home-assistant.md)
+- [Lab Environment](lab-environment.md)
+- [Backup & Recovery](backup-recovery.md)
