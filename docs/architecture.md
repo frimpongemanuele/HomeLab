@@ -81,7 +81,7 @@ The **Intel UHD Graphics 630** is also used by Jellyfin for hardware-accelerated
 
 The HomeLab currently operates inside the main home LAN.
 
-The primary router is a **TIM HUB+**, which provides:
+The primary router is a **ISP-provided router**, which provides:
 
 * Internet gateway
 * DHCP

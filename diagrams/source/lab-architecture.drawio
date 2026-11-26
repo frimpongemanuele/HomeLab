@@ -41,7 +41,7 @@
         <mxCell id="wj_pJuN2MNwfXW6XWKfz-62" edge="1" parent="1" source="wj_pJuN2MNwfXW6XWKfz-54" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Helvetica;fontSize=14;fontColor=default;" target="wj_pJuN2MNwfXW6XWKfz-61" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="wj_pJuN2MNwfXW6XWKfz-54" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontSize=14;" value="192.168.1.0/24&lt;br&gt;                         FLAT LAN" vertex="1">
+        <mxCell id="wj_pJuN2MNwfXW6XWKfz-54" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontSize=14;" value="192.0.2.0/24&lt;br&gt;                         FLAT LAN" vertex="1">
           <mxGeometry height="30" width="120" x="415.5" y="405" as="geometry" />
         </mxCell>
         <mxCell id="wj_pJuN2MNwfXW6XWKfz-61" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontSize=14;" value="⚠ Can reach other LAN systems" vertex="1">

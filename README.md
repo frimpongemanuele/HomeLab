@@ -1,5 +1,7 @@
 # HomeLab
 
+> Network addresses in this document are illustrative documentation values, not the live network configuration.
+
 > A self-hosted infrastructure project built around Proxmox VE, combining virtualization, smart-home automation, media services, secure remote access, monitoring, cybersecurity, backup and a dedicated lab environment.
 
 ![HomeLab Architecture](diagrams/exported/homelab-architecture.svg)
@@ -43,7 +45,7 @@ The project is designed as a practical learning environment where infrastructure
 | System Storage | 256 GB NVMe SSD |
 | Media / Backup Storage | 3 TB Seagate HDD |
 | HDD Enclosure | ICY BOX IB-377U3 USB 3.0 |
-| Main Router | TIM HUB+ |
+| Main Router | ISP-provided router |
 | Zigbee Coordinator | SONOFF Zigbee 3.0 USB Dongle Plus |
 | Smart Home Bridge | Philips Hue Bridge 2.0 |
 
@@ -53,7 +55,7 @@ The project is designed as a practical learning environment where infrastructure
 
 The Lenovo ThinkCentre runs **Proxmox VE** as the main virtualization layer.
 
-![Proxmox VE Workloads](media/proxmox-workloads.png)
+*Live administration screenshots are intentionally omitted from the public portfolio.*
 
 Major workloads are deliberately separated based on their requirements.
 
@@ -177,7 +179,7 @@ More details:
 The current HomeLab primarily operates on:
 
 ```text
-192.168.1.0/24
+192.0.2.0/24
 ```
 
 Internet-facing administrative ports are intentionally avoided.
@@ -250,7 +252,7 @@ Monitoring is implemented as multiple complementary layers rather than relying o
 
 ![Monitoring Architecture](diagrams/exported/monitoring-architecture.svg)
 
-![Grafana Dashboard](media/grafana-dashboard.png)
+*Monitoring evidence will use a sanitized or synthetic dashboard capture.*
 
 | Tool | Purpose |
 |---|---|
@@ -293,7 +295,7 @@ More details:
 
 **Homepage** acts as the central operational entry point for the HomeLab.
 
-![Homepage Dashboard](media/homepage-dashboard.png)
+*Dashboard evidence will use a sanitized screenshot with household information removed.*
 
 The dashboard groups services into areas such as:
 

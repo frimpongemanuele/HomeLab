@@ -1,5 +1,7 @@
 # Networking
 
+> Network addresses in this document are illustrative documentation values, not the live network configuration.
+
 ## Overview
 
 Networking is a core component of my HomeLab because nearly every service depends on reliable communication between the Proxmox host, virtualized workloads, Docker applications, smart-home devices, client devices, and remote systems.
@@ -25,7 +27,7 @@ The current environment still operates primarily on a **single trusted LAN**, wh
 
 ![Current HomeLab Network Architecture](../diagrams/exported/network-architecture.svg)
 
-The current HomeLab operates primarily on a single `192.168.1.0/24` LAN behind the TIM HUB+ router.
+The current HomeLab operates primarily on a single `192.0.2.0/24` LAN behind the ISP-provided router router.
 
 The Proxmox host acts as the main infrastructure node and connects the virtualized workloads to the physical network through a Linux bridge.
 
@@ -37,7 +39,7 @@ At the current stage, client devices, IoT devices, infrastructure services, and 
 
 ## Internet Gateway
 
-The primary Internet gateway is a **TIM HUB+** router.
+The primary Internet gateway is a **ISP-provided router** router.
 
 It currently provides:
 
@@ -51,13 +53,13 @@ It currently provides:
 The router is available internally at:
 
 ```text
-192.168.1.1
+192.0.2.10
 ```
 
 The primary HomeLab network currently uses:
 
 ```text
-192.168.1.0/24
+192.0.2.0/24
 ```
 
 This provides up to 254 usable IPv4 addresses within the local subnet.
@@ -71,7 +73,7 @@ The Proxmox server is the central compute node of the HomeLab.
 Current management address:
 
 ```text
-192.168.1.69
+192.0.2.11
 ```
 
 Proxmox uses a Linux bridge to connect virtual machines and LXC containers to the physical network interface.
@@ -227,7 +229,7 @@ Home Assistant
 http://<home-assistant-ip>:8123
 
 Jellyfin
-http://192.168.1.66:8096
+http://192.0.2.12:8096
 
 Homepage
 http://<homepage-ip>:3000
@@ -649,7 +651,7 @@ These controls reduce risk, but they do not provide complete isolation between d
 The most important current networking limitation is that the HomeLab still primarily operates on a single LAN:
 
 ```text
-192.168.1.0/24
+192.0.2.0/24
 ```
 
 This means systems with very different trust levels can potentially exist within the same Layer-2 network.
