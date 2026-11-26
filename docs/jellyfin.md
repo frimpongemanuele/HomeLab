@@ -1,5 +1,7 @@
 # Jellyfin Media Server
 
+> Paths such as `/srv/example-media` are illustrative examples, not live storage configuration.
+
 ## Overview
 
 Jellyfin is the primary media-streaming platform of the HomeLab.
@@ -30,8 +32,8 @@ Jellyfin runs as a dedicated LXC container on Proxmox, while media acquisition i
 
 The architecture separates three main concerns:
 
-- **Media serving** — Jellyfin runs independently in LXC 101.
-- **Media automation** — Sonarr, Radarr, qBittorrent, and related services run in Docker LXC 102.
+- **Media serving** — Jellyfin runs independently in media LXC.
+- **Media automation** — Sonarr, Radarr, qBittorrent, and related services run in Docker Docker LXC.
 - **Storage** — the external 3 TB HDD is mounted on the Proxmox host and exposed to Jellyfin through a bind mount.
 
 The Intel integrated GPU is also exposed to the Jellyfin container through `/dev/dri`, allowing VA-API hardware-accelerated transcoding.
@@ -54,13 +56,13 @@ Jellyfin runs inside a dedicated LXC container.
 | Property | Configuration |
 |---|---|
 | Hypervisor | Proxmox VE |
-| Container ID | `101` |
+| Container ID | Omitted |
 | Service | Jellyfin |
 | Deployment | Dedicated LXC |
 | Network | Home LAN |
 | Media Storage | External 3 TB HDD |
 | Media Mount | `/media` |
-| Web Interface | Port `8096` |
+| Web Interface | Access configuration omitted |
 | Hardware Acceleration | Intel GPU / VA-API |
 
 The separation can be represented as:
@@ -70,7 +72,7 @@ The separation can be represented as:
                  │
        ┌─────────┴─────────┐
        │                   │
-    LXC 101             LXC 102
+    media LXC             Docker LXC
     Jellyfin             Docker
        │                   │
        │              Media Automation
@@ -133,13 +135,13 @@ The media library resides on the external 3 TB HDD connected to the Proxmox host
 At the host level, the storage is mounted at:
 
 ```text
-/mnt/media
+/srv/example-media
 ```
 
 The disk contains media directories such as:
 
 ```text
-/mnt/media/
+/srv/example-media/
 ├── movies/
 ├── tv/
 └── proxmox-backups/
@@ -154,7 +156,7 @@ External HDD
      │
      ▼
 Proxmox Host
-/mnt/media
+/srv/example-media
      │
      │ Bind Mount
      ▼
@@ -177,19 +179,19 @@ Conceptually:
 
 ```text
 Host:
-    /mnt/media
+    /srv/example-media
 
         │
         ▼
 
-LXC 101:
+media LXC:
     /media
 ```
 
 A corresponding Proxmox container configuration can resemble:
 
 ```text
-mp0: /mnt/media,mp=/media
+mp0: /srv/example-media,mp=/media
 ```
 
 This avoids duplicating media inside the Jellyfin container's root filesystem.
@@ -470,7 +472,7 @@ This distinction is intentional.
                           │
                           ▼
                      Proxmox Host
-                      /mnt/media
+                      /srv/example-media
                       /         \
                      /           \
                     ▼             ▼
@@ -486,85 +488,24 @@ This follows the principle of separating application responsibilities.
 
 ---
 
-# Networking
+# Networking and Application Access
 
-Jellyfin is available on the local network through its dedicated LXC address.
+Jellyfin is hosted as a dedicated media workload. Local clients and intended remote application clients use the appropriate application access mechanism. Caddy provides managed HTTPS for selected application access; VPN-based administration remains a separate responsibility.
 
-The default Jellyfin HTTP service uses:
+![Media hosting and access roles](../diagrams/exported/jellyfin-architecture.svg)
 
-```text
-TCP 8096
-```
-
-Conceptually:
-
-```text
-Client
-   │
-   ▼
-Home LAN
-   │
-   ▼
-Jellyfin LXC
-   │
-   ▼
-TCP 8096
-```
-
-The management interface is not intentionally exposed directly to the public Internet.
-
----
-
-# Remote Access
-
-Remote access to the HomeLab is handled through VPN infrastructure rather than direct Jellyfin port forwarding.
-
-```text
-Remote Client
-      │
-      ▼
-Tailscale / WireGuard
-      │
-      ▼
-   Home LAN
-      │
-      ▼
- Jellyfin
-```
-
-This reduces the need to expose Jellyfin directly at the network perimeter.
-
-It also keeps remote-access policy separate from the media application itself.
-
----
+Live service endpoints, port mappings and proxy configuration are not included in the public portfolio.
 
 # Security Considerations
 
-Jellyfin processes complex media files and exposes a web application, making it part of the HomeLab attack surface.
+Media hosting requires appropriate application authentication, authorization, secure maintenance and storage access restrictions. Workload separation and hardware acceleration are operational design decisions, not substitutes for access control.
 
-Potential risks include:
+- Maintain private administrative access.
+- Apply intended application access policy and HTTPS where appropriate.
+- Review updates, application permissions and backup practices.
+- Keep media data and application configuration conceptually separate.
 
-- Web application vulnerabilities
-- Weak user credentials
-- Plugin vulnerabilities
-- Malicious media files
-- Media-parser vulnerabilities
-- Excessive filesystem permissions
-- Accidental Internet exposure
-
-Current controls include:
-
-- Dedicated LXC
-- Private LAN placement
-- VPN-based remote access
-- Separation from Docker workloads
-- Limited GPU-device passthrough
-- Media storage separated from application storage
-- No unnecessary direct public administration
-
-More details are documented in:
-
-[Cybersecurity Design](cybersecurity.md)
+[Cybersecurity design](cybersecurity.md) · [Networking](networking.md)
 
 ---
 
@@ -810,9 +751,9 @@ Compatible clients should play the original media whenever possible.
 
 Intel VA-API reduces CPU load for supported codecs.
 
-## Keep Remote Access Private
+## Separate Administration from Application Access
 
-VPN-based remote access is preferred over unnecessary public exposure.
+Administrative access remains private; intended application access is managed separately.
 
 ## Maintain Recoverability
 
@@ -857,7 +798,7 @@ The Jellyfin deployment demonstrates practical experience with:
 - Hardware-accelerated transcoding
 - Linux permissions
 - Network services
-- VPN-based remote access
+- Separation of administrative and intended application access
 - Backup planning
 - Service troubleshooting
 - Filesystem recovery

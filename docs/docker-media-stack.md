@@ -1,17 +1,19 @@
 # Docker & Media Stack
 
+> Paths such as `/srv/example-media` are illustrative examples, not live storage configuration.
+
 ## Overview
 
 The Docker environment hosts most of the application-level services in my HomeLab.
 
-Docker runs inside a dedicated **Proxmox LXC container (LXC 102)**, allowing application workloads to remain separated from:
+Docker runs inside a dedicated **Proxmox LXC container (Docker LXC)**, allowing application workloads to remain separated from:
 
 - The Proxmox hypervisor
 - Home Assistant
 - Jellyfin
 - Pi-hole
 - Tailscale
-- Experimental WebApp workloads
+- Independently hosted application workloads
 
 The Docker host is used for:
 
@@ -39,7 +41,7 @@ Physical Host
 Proxmox VE
     │
     ▼
-LXC 102 - Docker
+Docker LXC - Docker
     │
     ▼
 Docker Engine
@@ -90,25 +92,9 @@ This introduces an additional layer of nesting, which required specific LXC conf
 
 # LXC Configuration for Docker
 
-Docker initially encountered AppArmor-related restrictions inside the LXC container.
+Docker initially encountered compatibility restrictions when running inside an LXC environment. The deployment required an explicit review of nested-container support and confinement requirements.
 
-The Docker LXC configuration was adjusted to support nested containerization.
-
-Example:
-
-```text
-features: nesting=1,keyctl=1
-lxc.apparmor.profile: unconfined
-```
-
-Some Docker containers also required:
-
-```yaml
-security_opt:
-  - apparmor=unconfined
-```
-
-These changes allowed Docker to operate correctly inside the LXC environment.
+The learning outcome was that compatibility changes are security-relevant architectural decisions. Live confinement settings and workload-specific overrides are maintained in private configuration rather than published as a reusable template.
 
 ---
 
@@ -429,7 +415,7 @@ The media stack depends on the shared external storage mounted on the Proxmox ho
 The physical disk is mounted at:
 
 ```text
-/mnt/media
+/srv/example-media
 ```
 
 and exposed to the relevant workloads.
@@ -437,8 +423,8 @@ and exposed to the relevant workloads.
 The final media paths are:
 
 ```text
-/mnt/media/movies
-/mnt/media/tv
+/srv/example-media/movies
+/srv/example-media/tv
 ```
 
 Inside application environments these are exposed consistently as:
@@ -606,43 +592,15 @@ This would reduce unnecessary east-west communication between application contai
 
 ---
 
-# Nginx Proxy Manager
+# Reverse Proxies
 
-Nginx Proxy Manager acts as the reverse-proxy layer for selected internal applications.
+Nginx Proxy Manager remains part of the Docker workload and handles selected application-routing responsibilities. Caddy is a separate, independently maintained workload and serves other selected applications through managed HTTPS.
 
-Without a reverse proxy, applications are typically accessed using:
+The two proxies coexist rather than representing a complete migration. Their respective application mappings, endpoints and credentials are omitted from this public description.
 
-```text
-http://192.168.1.x:PORT
-```
+Proxying is not a substitute for application authentication, secure maintenance or network access policy.
 
-The reverse proxy enables cleaner hostname-based access.
-
-Conceptually:
-
-```text
-Client
-   │
-   ▼
-Internal DNS
-   │
-   ▼
-Nginx Proxy Manager
-   │
-   ├──► Jellyseerr
-   ├──► Grafana
-   ├──► Uptime Kuma
-   └──► Other Services
-```
-
-This provides a centralized point for:
-
-- Reverse proxy routing
-- Hostname management
-- TLS termination
-- Certificate management
-
-Nginx Proxy Manager is not treated as a replacement for firewalling or application authentication.
+[Networking](networking.md)
 
 ---
 

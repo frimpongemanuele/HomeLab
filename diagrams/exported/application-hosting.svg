@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="578" viewBox="0 0 1200 578" role="img" aria-labelledby="title description">
+<title id="title">Application hosting | Independent workloads</title><desc id="description">Two budgeting applications · confirmed roles, separate recovery lifecycles</desc>
+<rect width="1200" height="578" rx="18" fill="#101d2b"/>
+<g font-family="Segoe UI,Arial,sans-serif">
+<text x="38" y="45" fill="#64dfbd" font-size="16" font-weight="700" letter-spacing="2">HOMELAB / ARCHITECTURE DOCUMENTATION</text>
+<text x="38" y="89" fill="#f4f8fd" font-size="32" font-weight="700">Application hosting | Independent workloads</text>
+<text x="38" y="118" fill="#b4c7da" font-size="16">Two budgeting applications · confirmed roles, separate recovery lifecycles</text>
+<text x="38" y="158" fill="#64dfbd" font-size="14" font-weight="600" letter-spacing="1.4">CONFIRMED APPLICATIONS</text>
+<rect x="38" y="174" width="364" height="150" rx="11" fill="#1a3044" stroke="#35546a"/>
+<rect x="38" y="174" width="5" height="150" rx="2" fill="#64dfbd"/>
+<text x="56" y="205" fill="#8cdcc8" font-size="15" font-weight="700" letter-spacing=".5">PATRIXA</text>
+<text x="56" y="236" fill="#e5eef6" font-size="16">Dedicated Linux container</text>
+<text x="56" y="262" fill="#e5eef6" font-size="16">Self-hosted budgeting application</text>
+<text x="56" y="288" fill="#e5eef6" font-size="16">Internal stack to be verified</text>
+<rect x="418" y="174" width="364" height="150" rx="11" fill="#1a3044" stroke="#35546a"/>
+<rect x="418" y="174" width="5" height="150" rx="2" fill="#64dfbd"/>
+<text x="436" y="205" fill="#8cdcc8" font-size="15" font-weight="700" letter-spacing=".5">AVERLI</text>
+<text x="436" y="236" fill="#e5eef6" font-size="16">Dedicated Linux container</text>
+<text x="436" y="262" fill="#e5eef6" font-size="16">PostgreSQL · native authentication</text>
+<text x="436" y="288" fill="#e5eef6" font-size="16">Progressive Web App support</text>
+<rect x="798" y="174" width="364" height="150" rx="11" fill="#1a3044" stroke="#35546a"/>
+<rect x="798" y="174" width="5" height="150" rx="2" fill="#64dfbd"/>
+<text x="816" y="205" fill="#8cdcc8" font-size="15" font-weight="700" letter-spacing=".5">SEPARATION</text>
+<text x="816" y="236" fill="#e5eef6" font-size="16">Independent deployment roles</text>
+<text x="816" y="262" fill="#e5eef6" font-size="16">Separate maintenance lifecycle</text>
+<text x="816" y="288" fill="#e5eef6" font-size="16">Private application data</text>
+<text x="38" y="351" fill="#64dfbd" font-size="14" font-weight="600" letter-spacing="1.4">OPERATIONS AND RECOVERY</text>
+<rect x="38" y="367" width="364" height="150" rx="11" fill="#1a3044" stroke="#35546a"/>
+<rect x="38" y="367" width="5" height="150" rx="2" fill="#729bd2"/>
+<text x="56" y="398" fill="#8cdcc8" font-size="15" font-weight="700" letter-spacing=".5">PATRIXA RECOVERY</text>
+<text x="56" y="429" fill="#e5eef6" font-size="16">Backup procedure to verify</text>
+<text x="56" y="455" fill="#e5eef6" font-size="16">Document only confirmed results</text>
+<text x="56" y="481" fill="#e5eef6" font-size="16">Do not infer from Averli</text>
+<rect x="418" y="367" width="364" height="150" rx="11" fill="#1a3044" stroke="#35546a"/>
+<rect x="418" y="367" width="5" height="150" rx="2" fill="#729bd2"/>
+<text x="436" y="398" fill="#8cdcc8" font-size="15" font-weight="700" letter-spacing=".5">AVERLI RECOVERY</text>
+<text x="436" y="429" fill="#e5eef6" font-size="16">Scheduled database backups</text>
+<text x="436" y="455" fill="#e5eef6" font-size="16">Isolated restore verification</text>
+<text x="436" y="481" fill="#e5eef6" font-size="16">Application-level protection</text>
+<rect x="798" y="367" width="364" height="150" rx="11" fill="#1a3044" stroke="#35546a"/>
+<rect x="798" y="367" width="5" height="150" rx="2" fill="#729bd2"/>
+<text x="816" y="398" fill="#8cdcc8" font-size="15" font-weight="700" letter-spacing=".5">SHARED PRINCIPLES</text>
+<text x="816" y="429" fill="#e5eef6" font-size="16">Access control and maintenance</text>
+<text x="816" y="455" fill="#e5eef6" font-size="16">Sanitized evidence</text>
+<text x="816" y="481" fill="#e5eef6" font-size="16">Recovery validation</text>
+<text x="38" y="558" fill="#9eb1c2" font-size="13">Illustrative portfolio view · no live addresses, endpoints, credentials or operational configurations</text>
+</g></svg>

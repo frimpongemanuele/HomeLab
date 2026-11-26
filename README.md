@@ -17,7 +17,7 @@ The objective is to practice the complete infrastructure lifecycle: design, depl
 | Resilience | Backups, restore verification, recovery and dependency-aware startup |
 | Cybersecurity | Threat modeling, access restrictions, security monitoring and lab isolation |
 
-> **Documentation note (November 2026):** This is a public portfolio, not a live infrastructure runbook. Network addresses, service endpoints, guest identifiers, private household details and live dashboard screenshots are deliberately omitted or replaced with illustrative values. The detailed documents and architecture diagrams linked below describe the earlier baseline and are being reconciled with the latest workload inventory.
+> **Documentation note (November 2026):** This is a public portfolio, not a live infrastructure runbook. Network addresses, service endpoints, guest identifiers, private household details and live dashboard screenshots are deliberately omitted or replaced with illustrative values. The detailed documents and refreshed architecture diagrams below reflect the November workload inventory; historical lessons are identified separately.
 
 ## Infrastructure at a glance
 
@@ -54,6 +54,8 @@ Proxmox VE 9.x provides the main virtualization and containerization layer. The 
 Workloads are separated according to their resource requirements, responsibilities, update cycles and recovery needs. Automatic startup and dependency-aware startup ordering have been configured to improve recovery following a host restart.
 
 Guest names, exact versions, resource utilization and administrative identities are omitted from the public inventory. The workload count is a point-in-time observation, not an assertion that every application has passed a current health check.
+
+![HomeLab architecture overview](diagrams/exported/homelab-architecture.svg)
 
 ## Architecture and services
 
@@ -176,11 +178,12 @@ Future work includes centralized security logging, detection coverage, event inv
 
 ## Architecture documentation
 
-The repository contains editable draw.io diagrams and exported SVGs covering the existing architecture baseline. They are retained for reference while the November workload inventory and recent changes are reconciled.
+The repository contains editable draw.io diagrams and exported SVGs. The core architecture, networking, security, recovery, application and lab diagrams have been refreshed to reflect the November inventory. They illustrate roles and design principles rather than live network configuration.
 
 | Document | Scope |
 | --- | --- |
 | [Architecture](docs/architecture.md) | Hardware, virtualization and overall design |
+| [Application hosting](docs/application-hosting.md) | Patrixa, Averli and application recovery practices |
 | [Networking](docs/networking.md) | DNS, proxies, VPNs and segmentation |
 | [Monitoring](docs/monitoring.md) | Metrics, availability and observability |
 | [Cybersecurity](docs/cybersecurity.md) | Security controls, trust boundaries and roadmap |
@@ -232,4 +235,4 @@ The roadmap distinguishes planned improvements from deployed controls. The HomeL
 
 ## Status
 
-Actively maintained. The November 2026 workload inventory has been incorporated; detailed documentation, diagram alignment and reproducible examples are being updated in subsequent review stages.
+Actively maintained. The November 2026 workload inventory and associated architecture documentation have been updated. Reproducible examples, validation checks and sanitized evidence are the next review priorities.
