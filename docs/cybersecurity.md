@@ -1,5 +1,7 @@
 # Cybersecurity Design
 
+> Network addresses in this document are illustrative documentation values, not the live network configuration.
+
 ## Overview
 
 Security is a core design consideration of this HomeLab.
@@ -745,7 +747,7 @@ The diagram highlights the evolution of the security architecture.
 
 ### Current State
 
-The current environment uses a primarily flat `192.168.1.0/24` LAN.
+The current environment uses a primarily flat `192.0.2.0/24` LAN.
 
 Although workloads are separated through VMs, LXC containers, and Docker containers, infrastructure, services, IoT devices, and lab workloads still share the same underlying network.
 
@@ -792,7 +794,7 @@ Least-privilege communication between zones
 The HomeLab still primarily operates on:
 
 ```text
-192.168.1.0/24
+192.0.2.0/24
 ```
 
 This means systems with different trust levels can share the same Layer-2 network.

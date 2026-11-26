@@ -311,13 +311,13 @@ automation:
   - alias: "Kitchen lighting"
     triggers:
       - trigger: state
-        entity_id: binary_sensor.kitchen_occupancy
+        entity_id: binary_sensor.example_presence
         to: "on"
 
     actions:
-      - action: light.turn_on
+      - action: light.example_area
         target:
-          entity_id: light.kitchen
+          entity_id: light.example_area
 ```
 
 The example is intentionally generic so that private entity identifiers do not need to be exposed in the public repository.
@@ -534,7 +534,7 @@ For example:
 
 ```yaml
 entities:
-  - entity: light.example
+  - entity: light.example_area
     type3d: light
     object_id: "123"
 ```
@@ -550,7 +550,7 @@ Lights can be mapped to objects inside the 3D model.
 A conceptual configuration is:
 
 ```yaml
-- entity: light.example
+- entity: light.example_area
   type3d: light
   object_id: "123"
   light:
@@ -570,32 +570,8 @@ The long-term objective is to create a digital representation where physical dev
 
 # 3D Camera Configuration
 
-The 3D dashboard uses a defined camera position, rotation, and target.
+The dashboard uses a configured viewpoint and target. Specific camera coordinates, geometry and household layout are intentionally omitted from the public portfolio.
 
-Conceptually:
-
-```yaml
-camera_position:
-  x: ...
-  y: ...
-  z: ...
-
-camera_rotate:
-  x: ...
-  y: ...
-  z: ...
-
-camera_target:
-  x: ...
-  y: ...
-  z: ...
-```
-
-The exact values depend on the exported 3D model and are therefore environment-specific.
-
-Keeping the camera configuration explicit allows the dashboard to open consistently from the intended perspective.
-
----
 
 # Remote Access
 

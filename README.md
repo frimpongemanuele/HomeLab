@@ -1,692 +1,235 @@
 # HomeLab
 
-> A self-hosted infrastructure project built around Proxmox VE, combining virtualization, smart-home automation, media services, secure remote access, monitoring, cybersecurity, backup and a dedicated lab environment.
-
-![HomeLab Architecture](diagrams/exported/homelab-architecture.svg)
-
----
+> A continuously operated, Proxmox-based infrastructure lab for developing practical skills in Linux administration, networking, secure application hosting, monitoring, backup and recovery, and cybersecurity.
 
 ## Overview
 
-This repository documents the design, deployment, operation, and continuous improvement of my personal HomeLab.
+This project documents the design, deployment, operation, and evolution of my personal HomeLab. It started as a small self-hosted server and has grown into a platform supporting virtual machines, Linux containers, Docker applications, smart-home automation, and security learning.
 
-The environment started as a small self-hosted server and evolved into a structured infrastructure platform used to practice:
+The objective is to practice the complete infrastructure lifecycle: design, deploy, secure, monitor, troubleshoot, recover, and improve.
 
-- Virtualization
-- Linux administration
-- Containerization
-- Networking
-- Cybersecurity
-- Smart-home automation
-- Media services
-- Monitoring and observability
-- Backup and disaster recovery
-- Infrastructure troubleshooting
-- Application and security testing
+| Focus area | Examples of practical experience |
+| --- | --- |
+| Virtualization | Proxmox VE, virtual machines, LXC, workload separation |
+| Networking | DNS, reverse proxies, VPNs, HTTPS and access management |
+| Application hosting | Containerized services, databases, scheduled maintenance |
+| Observability | Prometheus, Grafana, uptime monitoring and system metrics |
+| Resilience | Backups, restore verification, recovery and dependency-aware startup |
+| Cybersecurity | Threat modeling, access restrictions, security monitoring and lab isolation |
 
-The objective is not simply to host applications.
+> **Documentation note (November 2026):** This is a public portfolio, not a live infrastructure runbook. Network addresses, service endpoints, guest identifiers, private household details and live dashboard screenshots are deliberately omitted or replaced with illustrative values. The detailed documents and architecture diagrams linked below describe the earlier baseline and are being reconciled with the latest workload inventory.
 
-The project is designed as a practical learning environment where infrastructure can be **built, broken, monitored, recovered, secured, and improved**.
+## Infrastructure at a glance
 
----
-
-# Infrastructure at a Glance
-
-## Hardware
+### Hardware
 
 | Component | Specification |
-|---|---|
-| Main Host | Lenovo ThinkCentre M720q Tiny |
-| CPU | Intel Core i5-8500T — 6 cores / 6 threads |
-| Integrated GPU | Intel UHD Graphics 630 |
-| RAM | 16 GB DDR4 |
-| System Storage | 256 GB NVMe SSD |
-| Media / Backup Storage | 3 TB Seagate HDD |
-| HDD Enclosure | ICY BOX IB-377U3 USB 3.0 |
-| Main Router | TIM HUB+ |
-| Zigbee Coordinator | SONOFF Zigbee 3.0 USB Dongle Plus |
-| Smart Home Bridge | Philips Hue Bridge 2.0 |
+| --- | --- |
+| Main host | Lenovo ThinkCentre M720q Tiny |
+| Processor | Intel Core i5-8500T, 6 cores / 6 threads |
+| Integrated graphics | Intel UHD Graphics 630 |
+| Memory | 16 GB DDR4 |
+| System storage | 256 GB NVMe SSD |
+| External storage | 3 TB HDD |
+| Networking | Residential gateway and Gigabit Ethernet |
+| Smart-home connectivity | Zigbee coordinator and smart-home bridge |
 
----
+### Virtualization platform
 
-# Virtualization
+Proxmox VE 9.x provides the main virtualization and containerization layer. The November 2026 inventory shows **one virtual machine and nine LXC containers**.
 
-The Lenovo ThinkCentre runs **Proxmox VE** as the main virtualization layer.
+| Workload | Type | Purpose |
+| --- | --- | --- |
+| Home Assistant OS | VM | Smart-home automation |
+| Jellyfin | LXC | Media streaming |
+| Docker | LXC | Containerized applications and media management |
+| Tailscale | LXC | Secure remote access |
+| Homepage | LXC | Central infrastructure dashboard |
+| Pi-hole | LXC | Local DNS and filtering |
+| Patrixa | LXC | Self-hosted budgeting application |
+| Caddy | LXC | Reverse proxy and HTTPS |
+| Dynamic DNS | LXC | Dynamic DNS management |
+| Averli | LXC | Self-hosted budgeting application |
 
-![Proxmox VE Workloads](media/proxmox-workloads.png)
+Workloads are separated according to their resource requirements, responsibilities, update cycles and recovery needs. Automatic startup and dependency-aware startup ordering have been configured to improve recovery following a host restart.
 
-Major workloads are deliberately separated based on their requirements.
+Guest names, exact versions, resource utilization and administrative identities are omitted from the public inventory. The workload count is a point-in-time observation, not an assertion that every application has passed a current health check.
 
-| ID | Workload | Type | Purpose |
-|---:|---|---|---|
-| 100 | Home Assistant OS | VM | Smart-home automation |
-| 101 | Jellyfin | LXC | Media streaming |
-| 102 | Docker | LXC | Containerized application platform |
-| 103 | Tailscale | LXC | Secure remote access |
-| 104 | Homepage | LXC | Central service dashboard |
-| 105 | Pi-hole | LXC | DNS filtering |
-| 106 | WebApp | LXC | Development and security lab |
+## Architecture and services
 
-This design allows services to have independent:
+### Smart-home platform
 
-- Resources
-- Update cycles
-- Recovery procedures
-- Security boundaries
-- Storage access
-- Failure domains
+Home Assistant OS runs in a dedicated VM and integrates:
 
----
+- Zigbee devices, Wi-Fi integrations and ESP32 Bluetooth proxies.
+- Local sensor integrations, automations and scenes.
+- Presence-aware automation and a custom dashboard.
+- Application-level backups, including an off-host backup mechanism.
 
-# Service Stack
+MQTT and camera/object-detection integrations are being evaluated as additional capabilities. Their final configuration and operational state will be documented once verified. No real camera feeds, home layout or occupancy information are included here.
 
-## Smart Home
+[Home Assistant documentation](docs/home-assistant.md)
 
-**Home Assistant OS** runs as a dedicated VM and provides:
+### Media infrastructure
 
-- Smart-device integration
-- Zigbee
-- Automations
-- Presence detection
-- ESP32 Bluetooth proxies
-- Bermuda room-level presence
-- Interactive 3D floor-plan dashboard
-- Google Drive backups
+Jellyfin runs in a dedicated container, with shared media storage and Intel integrated graphics acceleration through VA-API.
 
-![Home Assistant Architecture](diagrams/exported/home-assistant-architecture.svg)
+A separate Docker workload runs media-management services, including Jellyseerr, Sonarr, Radarr, Prowlarr, qBittorrent, Bazarr and Dispatcharr. The media stack is documented as an application architecture without private endpoints, account details or media-library contents.
 
----
+The deployment separates application configuration from media storage and supports multiple client types. Selected application services are available through HTTPS; administrative access remains separate from application access.
 
-## Media Server
+[Media server](docs/jellyfin.md) · [Docker and media stack](docs/docker-media-stack.md)
 
-**Jellyfin** runs inside a dedicated LXC container.
+### Application hosting
 
-The deployment includes:
+**Averli** is a self-hosted personal budgeting application deployed in a dedicated environment. Its deployment includes:
 
-- External shared media storage
-- Intel GPU passthrough
-- VA-API hardware acceleration
-- H.264 / HEVC / VP9 hardware decoding
-- VPN-based remote access
-- Separate application and media storage
+- PostgreSQL for persistent application data.
+- Native authentication and Progressive Web App support.
+- Scheduled database backups.
+- An isolated restore verification procedure.
 
-![Jellyfin Architecture](diagrams/exported/jellyfin-architecture.svg)
+Keeping the application separate from the media stack provides an independent management and recovery lifecycle. Real financial data, authentication details and application endpoints are not included.
 
----
+**Patrixa** is a second self-hosted budgeting application, deployed in the container previously used as the WebApp development environment. Its application architecture and backup procedures will be documented separately once verified.
 
-## Media Automation
+The former WebApp container is no longer listed as a general-purpose security testing environment. The dedicated Wazuh learning lab and future isolated test workloads are documented separately.
 
-The Docker LXC hosts the automated media-management stack.
+## Networking and access
 
-Core services include:
+The networking architecture combines private administration, local name resolution and controlled application routing.
 
-| Service | Role |
-|---|---|
-| Jellyseerr | Media requests |
-| Sonarr | TV automation |
-| Radarr | Movie automation |
-| Prowlarr | Indexer management |
-| qBittorrent | Download client |
-| Bazarr | Subtitle automation |
-| Dispatcharr | IPTV / live TV management |
+| Technology | Responsibility |
+| --- | --- |
+| Pi-hole | Local DNS resolution and DNS filtering |
+| Tailscale / WireGuard | VPN-based connectivity |
+| Nginx Proxy Manager | Reverse proxying for selected applications |
+| Caddy | Independent reverse proxy and HTTPS for selected applications |
+| Dynamic DNS | DNS record maintenance |
 
-![Media Automation Pipeline](diagrams/exported/media-pipeline.svg)
+Nginx Proxy Manager and Caddy coexist. They serve different application-routing responsibilities; neither is presented as having replaced the other.
 
----
+The management plane is intended to remain private, while selected application services may be exposed through deliberately managed HTTPS access. A reverse proxy is not a substitute for authentication, authorization or network isolation.
 
-# Docker Infrastructure
+The next phase of the network architecture emphasizes segmentation and access-policy validation. Live DNS records, endpoints, service mappings and firewall configurations remain private.
 
-Docker runs inside a dedicated Proxmox LXC.
+[Networking documentation](docs/networking.md)
 
-Additional services include:
+## Monitoring and observability
 
-### Networking
+The monitoring stack uses several complementary tools:
 
-- Nginx Proxy Manager
-- Speedtest Tracker
-
-### Monitoring
-
-- Prometheus
-- Grafana
-- Uptime Kuma
-- Netdata
-- Glances
-
-### Maintenance
-
-- What's Up Docker
-
-Running Docker inside LXC required nested-container support:
-
-```text
-features: nesting=1,keyctl=1
-lxc.apparmor.profile: unconfined
-```
-
-This configuration works well for the current environment, but the reduced AppArmor confinement is documented as a deliberate security trade-off.
-
-More details:
-
-[Docker & Media Stack](docs/docker-media-stack.md)
-
----
-
-# Networking
-
-The current HomeLab primarily operates on:
-
-```text
-192.168.1.0/24
-```
-
-Internet-facing administrative ports are intentionally avoided.
-
-Remote access is provided using:
-
-- **Tailscale**
-- **WireGuard**
-
-The current network remains primarily flat, while VLAN-based segmentation is planned.
-
-![HomeLab Network Architecture](diagrams/exported/network-architecture.svg)
-
-The target security zones are:
-
-```text
-Management
-Services
-IoT
-Lab
-Guest
-```
-
-with inter-VLAN firewall rules controlling communication between them.
-
-More details:
-
-[Networking](docs/networking.md)
-
----
-
-# Cybersecurity
-
-Security is treated as an architectural requirement rather than an additional application.
-
-Current controls include:
-
-- VPN-based remote administration
-- No intentional public exposure of management interfaces
-- VM / LXC workload separation
-- Unprivileged containers where appropriate
-- API-token authentication
-- Authenticated Samba access
-- SMB1 disabled
-- Pi-hole DNS filtering
-- Private administration interfaces
-- Backup and snapshot procedures
-- Secrets excluded from public configuration
-- Dedicated experimental lab workload
-
-![Security Architecture](diagrams/exported/security-architecture.svg)
-
-The current environment intentionally documents its limitations.
-
-Most importantly:
-
-> Virtualization isolation does not replace network segmentation.
-
-The current flat LAN therefore remains one of the major areas planned for improvement.
-
-More details:
-
-[Cybersecurity Design](docs/cybersecurity.md)
-
----
-
-# Monitoring & Observability
-
-Monitoring is implemented as multiple complementary layers rather than relying on a single tool.
-
-![Monitoring Architecture](diagrams/exported/monitoring-architecture.svg)
-
-![Grafana Dashboard](media/grafana-dashboard.png)
-
-| Tool | Purpose |
-|---|---|
-| Prometheus | Time-series metrics |
-| Grafana | Dashboards and historical analysis |
-| Uptime Kuma | Availability monitoring |
-| Netdata | Detailed real-time telemetry |
-| Glances | Lightweight host monitoring |
+| Tool | Responsibility |
+| --- | --- |
+| Prometheus | Time-series metrics collection |
+| Grafana | Historical metrics and dashboards |
+| Uptime Kuma | Service availability monitoring |
+| Netdata | Real-time system metrics |
+| Glances | Lightweight host visibility |
 | What's Up Docker | Container update visibility |
-| Speedtest Tracker | WAN performance history |
+| Speedtest Tracker | Internet performance trends |
 | Homepage | Central operational dashboard |
 
-This allows different questions to be answered independently:
+Together, these tools support availability monitoring, troubleshooting, capacity planning and maintenance. Operational dashboards and monitoring evidence will be shared only after sanitization or reconstruction with synthetic data.
 
-```text
-Is the service available?
-        ↓
-Uptime Kuma
+[Monitoring documentation](docs/monitoring.md)
 
-Why is the host slow?
-        ↓
-Netdata / Glances
+## Storage, backup and recovery
 
-What changed over time?
-        ↓
-Prometheus + Grafana
+The Proxmox host uses external storage for shared media and infrastructure backups, while workloads access the data they require through controlled storage integration and authenticated file sharing.
 
-Are containers outdated?
-        ↓
-What's Up Docker
-```
+Recovery practices include:
 
-More details:
+- Proxmox VM and LXC backups.
+- Snapshots before selected maintenance operations.
+- Home Assistant application backups.
+- Scheduled application and PostgreSQL backups.
+- Restore verification, including an isolated database restore.
+- Documented maintenance and recovery procedures.
 
-[Monitoring & Observability](docs/monitoring.md)
+An earlier storage incident provided practical experience in read-only-first diagnostics, filesystem investigation and data recovery. It reinforced the difference between snapshot rollback and independent backups.
 
----
+The backup strategy continues to evolve toward independent failure domains, capacity monitoring, off-host copies and routine restore testing.
 
-# Dashboard
+[Backup and recovery](docs/backup-recovery.md) · [Lessons learned](docs/lessons-learned.md)
 
-**Homepage** acts as the central operational entry point for the HomeLab.
+## Security engineering
 
-![Homepage Dashboard](media/homepage-dashboard.png)
+Security is treated as an infrastructure design and operating requirement.
 
-The dashboard groups services into areas such as:
+### Implemented practices
 
-```text
-Smart Home
-Media
-Infrastructure
-Downloads
-Network
-Monitoring
-Maintenance
-```
+- VPN-based administrative access and separation of management from application services.
+- VM and container workload separation with unprivileged containers where appropriate.
+- DNS filtering and authenticated file sharing.
+- Restricted administrative access and credential handling outside Git.
+- Maintenance, backups and recovery practices.
+- Documentation of architectural trade-offs and risk-based isolation decisions.
 
-It provides quick access to the environment while monitoring platforms remain responsible for detailed telemetry.
+### Security monitoring and learning
 
----
+A **separate Wazuh SIEM lab** has been built on a virtualized test environment with a monitored Windows endpoint. An authentication-failure detection test was confirmed end to end. This is distinct from the operational Proxmox HomeLab: integration of security telemetry from the main infrastructure is a planned improvement.
 
-# Storage
+Future work includes centralized security logging, detection coverage, event investigation and defensive monitoring in a dedicated test environment. Findings and evidence will use controlled or sanitized data.
 
-The HomeLab currently uses a 3 TB external HDD mounted on the Proxmox host at:
+[Cybersecurity documentation](docs/cybersecurity.md) · [Lab environment](docs/lab-environment.md)
 
-```text
-/mnt/media
-```
+## Architecture documentation
 
-The storage contains:
+The repository contains editable draw.io diagrams and exported SVGs covering the existing architecture baseline. They are retained for reference while the November workload inventory and recent changes are reconciled.
 
-```text
-/mnt/media
-├── movies
-├── tv
-└── proxmox-backups
-```
+| Document | Scope |
+| --- | --- |
+| [Architecture](docs/architecture.md) | Hardware, virtualization and overall design |
+| [Networking](docs/networking.md) | DNS, proxies, VPNs and segmentation |
+| [Monitoring](docs/monitoring.md) | Metrics, availability and observability |
+| [Cybersecurity](docs/cybersecurity.md) | Security controls, trust boundaries and roadmap |
+| [Backup and recovery](docs/backup-recovery.md) | Backup strategy, recovery incidents and lessons |
+| [Docker and media stack](docs/docker-media-stack.md) | Containerized applications and service roles |
+| [Home Assistant](docs/home-assistant.md) | Smart-home platform and automation |
+| [Jellyfin](docs/jellyfin.md) | Media hosting, storage and hardware acceleration |
+| [Lab environment](docs/lab-environment.md) | Development and controlled security learning |
+| [Lessons learned](docs/lessons-learned.md) | Engineering decisions and operational retrospective |
 
-The disk is also exposed to Windows clients through Samba.
-
-Jellyfin receives access through an LXC bind mount.
-
-```text
-External HDD
-      │
-      ▼
-Proxmox
-/mnt/media
-      │
-      ├── Jellyfin LXC
-      ├── Docker Media Stack
-      └── Samba
-```
-
-The current use of the same physical disk for media and infrastructure backups is a known resilience limitation.
-
----
-
-# Backup & Recovery
-
-The environment uses multiple recovery mechanisms:
-
-- Proxmox snapshots
-- Proxmox VM/LXC backups
-- Home Assistant application backups
-- Home Assistant Google Drive backups
-- Version-controlled configuration
-- Documented recovery procedures
-
-![Backup Architecture](diagrams/exported/backup-architecture.svg)
-
-A major storage incident during the project resulted in practical experience with:
-
-- TestDisk
-- R-Studio
-- PhotoRec
-- Filesystem investigation
-- Raw file carving
-- Media-library reconstruction
-- `/etc/fstab` recovery
-- Safe external-storage mounting
-
-One of the main lessons from the incident was:
-
-> A backup must not share every failure domain with the data it protects.
-
-More details:
-
-[Backup & Recovery](docs/backup-recovery.md)
-
----
-
-# Lab Environment
-
-A dedicated unprivileged LXC is used for:
-
-- Web application development
-- API testing
-- Linux experimentation
-- Deployment testing
-- Reverse-proxy testing
-- Security experiments
-- Application-security learning
-
-![Lab Environment Architecture](diagrams/exported/lab-architecture.svg)
-
-The current WebApp environment still shares the main LAN.
-
-The target architecture moves lab workloads into a dedicated VLAN with restricted access to trusted infrastructure.
-
-This distinction is deliberately documented:
-
-```text
-Compute Isolation
-       ≠
-Network Isolation
-```
-
-More details:
-
-[Lab Environment](docs/lab-environment.md)
-
----
-
-# Repository Structure
+## Repository structure
 
 ```text
 HomeLab/
-│
 ├── README.md
-│
-├── docs/
-│   ├── architecture.md
-│   ├── networking.md
-│   ├── monitoring.md
-│   ├── cybersecurity.md
-│   ├── backup-recovery.md
-│   ├── docker-media-stack.md
-│   ├── home-assistant.md
-│   ├── jellyfin.md
-│   ├── lab-environment.md
-│   └── lessons-learned.md
-│
+├── docs/               # Technical documentation
 ├── diagrams/
-│   ├── source/
-│   │   └── *.drawio
-│   │
-│   └── exported/
-│       └── *.svg
-│
-└── media/
-    └── screenshots/
+│   ├── source/         # Editable draw.io diagrams
+│   └── exported/       # SVG diagrams
+├── configs/            # Planned reusable configuration examples
+└── scripts/            # Planned maintenance automation examples
 ```
 
----
+The configuration and script files currently include placeholders. Future versions will provide tested, sanitized examples rather than copies of live configuration.
 
-# Documentation
+## Roadmap
 
-Detailed technical documentation is separated by topic.
+| Priority | Planned improvement |
+| --- | --- |
+| Network security | Segmentation, access-policy review and stronger separation of test workloads |
+| Detection engineering | Integrate defensive telemetry with Wazuh and develop alert investigation scenarios |
+| Backup resilience | Independent backup storage, capacity alerts and documented restore testing |
+| Infrastructure automation | Reusable configuration examples, validation checks and maintenance automation |
+| Hardware expansion | Evaluate a modular rack, power protection and managed networking equipment |
+| Smart-home development | Validate device integrations and privacy-preserving automation |
+| Portfolio documentation | Refresh architecture diagrams, sanitize evidence and add reproducible examples |
 
-| Documentation | Description |
-|---|---|
-| [Architecture](docs/architecture.md) | Overall infrastructure and virtualization design |
-| [Networking](docs/networking.md) | LAN, DNS, VPN, reverse proxy, and segmentation |
-| [Monitoring](docs/monitoring.md) | Prometheus, Grafana, Uptime Kuma, Netdata, and observability |
-| [Cybersecurity](docs/cybersecurity.md) | Threat model, trust boundaries, security controls, and roadmap |
-| [Backup & Recovery](docs/backup-recovery.md) | Snapshots, backups, storage incidents, and disaster recovery |
-| [Docker & Media Stack](docs/docker-media-stack.md) | Docker architecture and media automation |
-| [Home Assistant](docs/home-assistant.md) | Smart-home platform, Zigbee, presence, and 3D dashboard |
-| [Jellyfin](docs/jellyfin.md) | Media server, storage, GPU passthrough, and transcoding |
-| [Lab Environment](docs/lab-environment.md) | Development and security-testing environment |
-| [Lessons Learned](docs/lessons-learned.md) | Engineering decisions, incidents, and lessons from operating the lab |
+The roadmap distinguishes planned improvements from deployed controls. The HomeLab is a learning environment rather than a claim of enterprise-grade security or availability.
 
----
+## Skills demonstrated
 
-# Architecture Principles
+- Proxmox VE, QEMU, LXC and Linux administration.
+- Docker and containerized service deployment.
+- TCP/IP networking, DNS, VPNs and reverse proxying.
+- Prometheus, Grafana and infrastructure observability.
+- PostgreSQL, application hosting and database recovery.
+- Threat modeling, defensive log analysis, access control and network segmentation.
+- Troubleshooting, incident recovery and technical documentation.
 
-Several principles guide the evolution of the environment.
+## Status
 
-### Keep Management Private
-
-Administrative services should not be exposed directly to the public Internet unless there is a specific requirement.
-
-### Separate Responsibilities
-
-Each service should have a clearly defined purpose.
-
-```text
-Jellyfin ≠ File Server
-Pi-hole ≠ Firewall
-Homepage ≠ Monitoring Platform
-Reverse Proxy ≠ Network Security
-```
-
-### Match Isolation to Risk
-
-```text
-Normal Linux Service
-        ↓
-       LXC
-
-Sensitive Appliance
-        ↓
-        VM
-
-Higher-Risk Testing
-        ↓
-Isolated VM / Lab Network
-```
-
-### Local First
-
-Smart-home and infrastructure services should operate locally whenever practical.
-
-### Recovery Is Part of Infrastructure
-
-Deployment is incomplete without a recovery strategy.
-
-### Document Reality
-
-Implemented and planned architecture are documented separately.
-
----
-
-# Selected Lessons Learned
-
-Operating the HomeLab has produced several practical lessons:
-
-- Virtualization does not automatically provide network segmentation.
-- Snapshots are not backups.
-- Backups need independent failure domains.
-- Docker inside LXC introduces compatibility/security trade-offs.
-- External storage should not prevent the hypervisor from booting.
-- Disk modification should follow a read-only-first workflow.
-- Shared media paths must be designed consistently.
-- Monitoring and security monitoring are different disciplines.
-- Update awareness can be preferable to blind automatic updates.
-- Remote-access VPNs and outbound privacy VPNs solve different problems.
-- Documentation becomes part of the infrastructure as systems grow.
-
-The full retrospective is available in:
-
-[Lessons Learned](docs/lessons-learned.md)
-
----
-
-# Current Limitations
-
-This project intentionally documents areas that are not yet complete.
-
-Current limitations include:
-
-- Primarily flat LAN
-- No production VLAN segmentation yet
-- Single Proxmox host
-- Media and backups sharing one physical HDD
-- Docker inside LXC with relaxed AppArmor
-- exFAT storage with permissive filesystem semantics
-- No SIEM deployment yet
-- No IDS/IPS deployment yet
-- Limited centralized security logging
-- Experimental workloads currently sharing the primary LAN
-
-These are part of the roadmap rather than being hidden from the project documentation.
-
----
-
-# Roadmap
-
-Future improvements include:
-
-### Networking & Security
-
-- Management VLAN
-- Services VLAN
-- IoT VLAN
-- Lab VLAN
-- Guest VLAN
-- Inter-VLAN firewall rules
-- Stronger management-network restrictions
-
-### Detection
-
-- Wazuh
-- Suricata
-- Centralized logging
-- Security dashboards
-- Authentication monitoring
-
-### Backup & Storage
-
-- Independent backup disk
-- Proxmox Backup Server
-- Automated restore testing
-- Off-site encrypted backups
-- Storage-health alerting
-
-### Automation
-
-- Ansible
-- Infrastructure-as-Code
-- Configuration templates
-- Secret management
-- Automated compliance checks
-
-### Lab
-
-- Dedicated isolated test network
-- Separate attacker and target machines
-- OWASP testing environments
-- Vulnerability scanning
-- CI/CD experimentation
-
----
-
-# Skills Demonstrated
-
-This project provides practical experience with:
-
-```text
-Proxmox VE
-Linux Administration
-Virtual Machines
-LXC Containers
-Docker
-Docker Compose
-Home Assistant
-Zigbee
-ESP32
-Jellyfin
-Intel VA-API
-Linux Storage
-Samba
-Networking
-DNS
-Pi-hole
-VPNs
-Tailscale
-WireGuard
-Reverse Proxies
-Prometheus
-Grafana
-Uptime Monitoring
-Backup & Recovery
-Threat Modeling
-Application Security
-Troubleshooting
-Technical Documentation
-```
-
----
-
-# Why This Project Matters
-
-The HomeLab is intentionally documented as more than a collection of self-hosted applications.
-
-It demonstrates the complete infrastructure lifecycle:
-
-```text
-Design
-   ↓
-Deploy
-   ↓
-Integrate
-   ↓
-Secure
-   ↓
-Monitor
-   ↓
-Break
-   ↓
-Troubleshoot
-   ↓
-Recover
-   ↓
-Document
-   ↓
-Improve
-```
-
-The project provides a practical environment for understanding how individual technologies interact as part of a complete system.
-
----
-
-# Status
-
-The HomeLab is actively evolving.
-
-Current focus areas are:
-
-```text
-Network Segmentation
-Security Monitoring
-Backup Resilience
-Infrastructure Automation
-Smart-Home Development
-Lab Expansion
-```
-
-Detailed implementation decisions and current limitations are documented throughout the repository.
+Actively maintained. The November 2026 workload inventory has been incorporated; detailed documentation, diagram alignment and reproducible examples are being updated in subsequent review stages.

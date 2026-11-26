@@ -1,5 +1,7 @@
 # Lab Environment
 
+> Network addresses in this document are illustrative documentation values, not the live network configuration.
+
 ## Overview
 
 The HomeLab includes a dedicated environment for development, experimentation, and security testing.
@@ -48,7 +50,7 @@ The diagram shows the difference between the current and target security models.
 
 ### Current State
 
-LXC 106 hosts the WebApp development and testing environment on the same `192.168.1.0/24` flat LAN used by the rest of the HomeLab.
+LXC 106 hosts the WebApp development and testing environment on the same `192.0.2.0/24` flat LAN used by the rest of the HomeLab.
 
 The container provides compute and filesystem isolation, but it does not yet provide strong network isolation. A compromised or intentionally vulnerable lab workload could potentially communicate with other systems on the LAN.
 
@@ -363,7 +365,7 @@ If the environment becomes excessively modified or unstable, rebuilding it can b
 At present, the lab is connected to the same primary LAN as much of the rest of the HomeLab.
 
 ```text
-               192.168.1.0/24
+               192.0.2.0/24
                      │
         ┌────────────┼────────────┐
         │            │            │

@@ -1,5 +1,7 @@
 # Lessons Learned
 
+> Network addresses in this document are illustrative documentation values, not the live network configuration.
+
 ## Overview
 
 Building the HomeLab has involved much more than installing individual applications.
@@ -77,7 +79,7 @@ However, they do not automatically create network security boundaries.
 The current HomeLab primarily operates on:
 
 ```text
-192.168.1.0/24
+192.0.2.0/24
 ```
 
 Therefore:
