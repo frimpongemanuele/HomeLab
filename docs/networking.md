@@ -6,7 +6,9 @@
 
 Networking connects the infrastructure, application and management layers. The HomeLab uses local DNS, VPN connectivity, reverse proxies and network observability to support controlled access and maintainability.
 
-![Network service responsibilities](../diagrams/exported/network-architecture.svg)
+![Original networking architecture](../diagrams/exported/network-architecture.svg)
+
+*Earlier networking illustration, retained as historical context. The current roles are described below.*
 
 ## Network roles
 

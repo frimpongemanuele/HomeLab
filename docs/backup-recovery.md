@@ -8,7 +8,9 @@ The objective is to protect important data and make infrastructure changes recov
 
 # Backup Architecture
 
-![Layered backup and recovery architecture](../diagrams/exported/backup-architecture.svg)
+![Original backup architecture](../diagrams/exported/backup-architecture.svg)
+
+*Earlier recovery architecture illustration; the table below includes the newer application-level recovery practices.*
 
 | Recovery layer | Documented practice |
 | --- | --- |

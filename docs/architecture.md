@@ -6,7 +6,9 @@
 
 The HomeLab is a continuously operated Proxmox-based environment designed to practice virtualization, Linux administration, application hosting, networking, monitoring, secure operations and recovery.
 
-![HomeLab high-level architecture](../diagrams/exported/homelab-architecture.svg)
+![Original HomeLab architecture](../diagrams/exported/homelab-architecture.svg)
+
+*Historical architecture illustration; refer to the November workload inventory below for the current roles.*
 
 The infrastructure evolved from a laptop server into a Lenovo ThinkCentre M720q Tiny platform. Its design separates workload responsibilities, keeps management access distinct from application access, and treats monitoring and recovery as part of the infrastructure lifecycle.
 
@@ -77,7 +79,9 @@ Pi-hole provides local name resolution and DNS filtering. Nginx Proxy Manager an
 
 Administrative access is intended to remain private through VPN-based connectivity. Selected application access is handled through managed HTTPS. These are distinct access purposes, and a proxy is not a substitute for application authentication, authorization or network access policy.
 
-![Networking roles](../diagrams/exported/network-architecture.svg)
+![Original networking architecture](../diagrams/exported/network-architecture.svg)
+
+*Earlier networking illustration; the text above describes the updated access roles.*
 
 [Networking](networking.md)
 

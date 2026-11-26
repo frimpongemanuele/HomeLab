@@ -6,7 +6,9 @@
 
 The security learning environment is distinct from stable application and infrastructure workloads. The objective is to build practical defensive skills in a controlled setting without exposing operational systems or real personal data to experiments.
 
-![Separate detection learning environment](../diagrams/exported/lab-architecture.svg)
+![Original lab architecture](../diagrams/exported/lab-architecture.svg)
+
+*Historical WebApp lab illustration only. It does not represent the separate Wazuh lab or the current Patrixa workload.*
 
 ## Confirmed separate Wazuh lab
 

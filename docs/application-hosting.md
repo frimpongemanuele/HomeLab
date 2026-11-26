@@ -6,8 +6,6 @@
 
 The HomeLab hosts two separate, self-hosted budgeting applications in independent Linux container environments: Patrixa and Averli.
 
-![Independent application workloads](../diagrams/exported/application-hosting.svg)
-
 | Application | Role | Confirmed deployment information |
 | --- | --- | --- |
 | Patrixa | Budgeting application | Dedicated LXC; former WebApp environment repurposed |

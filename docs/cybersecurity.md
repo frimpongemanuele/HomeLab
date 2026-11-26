@@ -11,7 +11,9 @@
 - Separate controlled learning exercises from operational infrastructure.
 - Verify controls and distinguish deployed capabilities from future plans.
 
-![Security engineering approach](../diagrams/exported/security-architecture.svg)
+![Original security architecture](../diagrams/exported/security-architecture.svg)
+
+*Historical security illustration; use the written controls and roadmap below for the current account.*
 
 ## Implemented security practices
 

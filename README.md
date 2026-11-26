@@ -17,7 +17,7 @@ The objective is to practice the complete infrastructure lifecycle: design, depl
 | Resilience | Backups, restore verification, recovery and dependency-aware startup |
 | Cybersecurity | Threat modeling, access restrictions, security monitoring and lab isolation |
 
-> **Documentation note (November 2026):** This is a public portfolio, not a live infrastructure runbook. Network addresses, service endpoints, guest identifiers, private household details and live dashboard screenshots are deliberately omitted or replaced with illustrative values. The detailed documents and refreshed architecture diagrams below reflect the November workload inventory; historical lessons are identified separately.
+> **Documentation note (November 2026):** This is a public portfolio, not a live infrastructure runbook. Network addresses, service endpoints, guest identifiers, private household details and live dashboard screenshots are deliberately omitted or replaced with illustrative values. The written documentation reflects the November workload inventory. The original architecture diagrams are retained as earlier design snapshots and should not be read as a current deployment inventory.
 
 ## Infrastructure at a glance
 
@@ -55,7 +55,9 @@ Workloads are separated according to their resource requirements, responsibiliti
 
 Guest names, exact versions, resource utilization and administrative identities are omitted from the public inventory. The workload count is a point-in-time observation, not an assertion that every application has passed a current health check.
 
-![HomeLab architecture overview](diagrams/exported/homelab-architecture.svg)
+![Original HomeLab architecture diagram](diagrams/exported/homelab-architecture.svg)
+
+*Earlier architecture snapshot; the workload table above is the current inventory.*
 
 ## Architecture and services
 
@@ -178,7 +180,7 @@ Future work includes centralized security logging, detection coverage, event inv
 
 ## Architecture documentation
 
-The repository contains editable draw.io diagrams and exported SVGs. The core architecture, networking, security, recovery, application and lab diagrams have been refreshed to reflect the November inventory. They illustrate roles and design principles rather than live network configuration.
+The repository retains the original editable draw.io diagrams and exported SVGs. These are earlier architecture snapshots; the written documentation reflects subsequent workload and networking changes. The diagrams remain illustrative and are not live network configuration.
 
 | Document | Scope |
 | --- | --- |
@@ -235,4 +237,4 @@ The roadmap distinguishes planned improvements from deployed controls. The HomeL
 
 ## Status
 
-Actively maintained. The November 2026 workload inventory and associated architecture documentation have been updated. Reproducible examples, validation checks and sanitized evidence are the next review priorities.
+Actively maintained. The November 2026 workload inventory and associated written architecture documentation have been updated. Original visual diagrams are preserved. Reproducible examples, validation checks and sanitized evidence are the next review priorities.

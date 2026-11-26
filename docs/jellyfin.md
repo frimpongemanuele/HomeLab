@@ -28,7 +28,9 @@ This separation provides:
 
 Jellyfin runs as a dedicated LXC container on Proxmox, while media acquisition is handled separately inside the Docker LXC.
 
-![Jellyfin Architecture](../diagrams/exported/jellyfin-architecture.svg)
+![Original Jellyfin architecture](../diagrams/exported/jellyfin-architecture.svg)
+
+*Historical illustration; see the Networking and Application Access section for updated access responsibilities.*
 
 The architecture separates three main concerns:
 
@@ -491,8 +493,6 @@ This follows the principle of separating application responsibilities.
 # Networking and Application Access
 
 Jellyfin is hosted as a dedicated media workload. Local clients and intended remote application clients use the appropriate application access mechanism. Caddy provides managed HTTPS for selected application access; VPN-based administration remains a separate responsibility.
-
-![Media hosting and access roles](../diagrams/exported/jellyfin-architecture.svg)
 
 Live service endpoints, port mappings and proxy configuration are not included in the public portfolio.
 

@@ -30,7 +30,9 @@ This provides stronger isolation and access to the complete Home Assistant ecosy
 
 Home Assistant runs as a dedicated virtual machine on Proxmox and acts as the central orchestration layer for smart-home devices, integrations, presence detection, and automations.
 
-![Home Assistant Architecture](../diagrams/exported/home-assistant-architecture.svg)
+![Original Home Assistant architecture](../diagrams/exported/home-assistant-architecture.svg)
+
+*Earlier platform illustration; recent experiments are described in the November update note.*
 
 The architecture uses multiple integration methods:
 

@@ -23,7 +23,9 @@ Instead of relying on a single monitoring product, the environment uses multiple
 
 ## Monitoring Architecture
 
-![Monitoring Architecture](../diagrams/exported/monitoring-architecture.svg)
+![Original monitoring architecture](../diagrams/exported/monitoring-architecture.svg)
+
+*Original operational monitoring illustration; the separate Wazuh learning environment is discussed below.*
 
 The monitoring stack follows a layered model:
 
