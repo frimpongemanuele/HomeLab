@@ -1,6 +1,10 @@
 # Lessons Learned
 
+> Paths such as `/srv/example-media` are illustrative examples, not live storage configuration.
+
 > Network addresses in this document are illustrative documentation values, not the live network configuration.
+
+> November 2026 note: this retrospective includes earlier design decisions. The former WebApp workload now hosts Patrixa, and Wazuh has been established as a separate learning environment. Historical examples should not be interpreted as the current deployment.
 
 ## Overview
 
@@ -575,7 +579,7 @@ Same File
 
 Container A → /downloads/movie.mkv
 Container B → /data/downloads/movie.mkv
-Container C → /mnt/media/movie.mkv
+Container C → /srv/example-media/movie.mkv
 ```
 
 can create unnecessary path-mapping complexity.
@@ -641,7 +645,7 @@ Homepage ≠ Monitoring Platform
 
 # 16. Reverse Proxies Do Not Replace Network Security
 
-Nginx Proxy Manager simplifies access to internal web applications and provides centralized routing.
+Nginx Proxy Manager and Caddy now coexist as independently maintained reverse-proxy workloads, with distinct application-routing responsibilities.
 
 However:
 
@@ -718,7 +722,7 @@ Remote administration and outbound privacy should be designed independently.
 
 # 18. Experimental Workloads Need Different Trust Assumptions
 
-The WebApp LXC provides a dedicated environment for:
+The former WebApp LXC provided a dedicated environment for:
 
 - Development
 - Application testing
@@ -950,7 +954,7 @@ VLAN segmentation is planned.
 Similarly:
 
 - Gluetun is planned.
-- Wazuh is planned.
+- Integration of the separate Wazuh learning environment with operational infrastructure is planned.
 - Suricata is planned.
 - Dedicated backup storage is planned.
 - Stronger Lab isolation is planned.

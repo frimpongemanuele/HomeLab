@@ -1,5 +1,7 @@
 # Home Assistant
 
+> November 2026 update: MQTT and camera/object-detection integrations have been explored. Their current operational status remains to be verified; this document does not claim a completed camera deployment. Private camera details, household occupancy and layouts are omitted.
+
 ## Overview
 
 Home Assistant is the central smart-home platform of the HomeLab.
@@ -28,7 +30,9 @@ This provides stronger isolation and access to the complete Home Assistant ecosy
 
 Home Assistant runs as a dedicated virtual machine on Proxmox and acts as the central orchestration layer for smart-home devices, integrations, presence detection, and automations.
 
-![Home Assistant Architecture](../diagrams/exported/home-assistant-architecture.svg)
+![Original Home Assistant architecture](../diagrams/exported/home-assistant-architecture.svg)
+
+*Earlier platform illustration; recent experiments are described in the November update note.*
 
 The architecture uses multiple integration methods:
 
@@ -49,9 +53,9 @@ Home Assistant runs as a dedicated virtual machine on the Proxmox host.
 | Property | Configuration |
 |---|---|
 | Hypervisor | Proxmox VE |
-| VM ID | `100` |
+| VM ID | Omitted |
 | Operating System | Home Assistant OS |
-| Hostname | `haos-17.2` |
+| Hostname | Omitted |
 | Memory | 4 GB |
 | Virtual Disk | 32 GB |
 | Network | Home LAN |
@@ -68,7 +72,7 @@ Lenovo ThinkCentre
     Proxmox VE
         │
         ▼
-     VM 100
+     Home Assistant VM
         │
         ▼
 Home Assistant OS
@@ -115,9 +119,9 @@ Problems affecting Docker applications do not directly affect Home Assistant.
 ```text
 Proxmox
    │
-   ├── VM 100 → Home Assistant
+   ├── Home Assistant VM → Home Assistant
    │
-   └── LXC 102 → Docker
+   └── Docker LXC → Docker
                     │
                     ├── Sonarr
                     ├── Radarr
@@ -650,7 +654,7 @@ Home Assistant uses multiple recovery layers.
 
 ## Proxmox
 
-Because Home Assistant runs as VM 100, the entire virtual machine can be protected through Proxmox backup mechanisms.
+Because Home Assistant runs as Home Assistant VM, the entire virtual machine can be protected through Proxmox backup mechanisms.
 
 ## Home Assistant Backups
 

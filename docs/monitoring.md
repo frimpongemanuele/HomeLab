@@ -23,7 +23,9 @@ Instead of relying on a single monitoring product, the environment uses multiple
 
 ## Monitoring Architecture
 
-![Monitoring Architecture](../diagrams/exported/monitoring-architecture.svg)
+![Original monitoring architecture](../diagrams/exported/monitoring-architecture.svg)
+
+*Original operational monitoring illustration; the separate Wazuh learning environment is discussed below.*
 
 The monitoring stack follows a layered model:
 
@@ -785,6 +787,16 @@ A small YAML error can remove visibility across the environment.
 
 ---
 
+# Separate Security Monitoring Lab
+
+A Wazuh SIEM and monitored Windows endpoint have been established in a separate virtualized learning environment. Authentication-failure detection was previously confirmed in the project notes.
+
+This is separate from the operational monitoring stack described here. Integration of security telemetry from the primary Proxmox infrastructure is planned and not yet confirmed.
+
+See [Lab environment](lab-environment.md) and [Cybersecurity](cybersecurity.md).
+
+---
+
 # Future Improvements
 
 The monitoring platform will continue evolving as the HomeLab becomes more security-focused.
@@ -804,7 +816,7 @@ Planned improvements include:
 - Certificate expiration monitoring
 - Centralized logging
 - Security-event correlation
-- Wazuh integration
+- Integration of selected operational telemetry with the separate Wazuh lab
 - Suricata network monitoring
 - Loki for log aggregation
 - Automated notifications

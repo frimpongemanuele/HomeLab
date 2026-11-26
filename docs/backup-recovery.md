@@ -1,67 +1,25 @@
 # Backup & Recovery
 
-This document describes the backup, snapshot, and recovery strategy implemented in the HomeLab.
+> Paths such as `/srv/example-media` are illustrative examples, not live storage configuration.
 
-The objective is not only to protect application data, but also to make infrastructure changes and upgrades recoverable.
+> November 2026 update. Backup responsibilities now include both guest-level protection and application-level recovery. Live storage paths, credentials, retention values and capacity details remain private.
 
-The environment currently uses multiple recovery mechanisms:
-
-- Proxmox VE snapshots
-- Proxmox VM/LXC backups
-- Home Assistant backups
-- Google Drive off-host backup for Home Assistant
-- External HDD storage
-- Configuration backups for Docker and infrastructure services
-- Recovery procedures tested through real incidents
-
-> [!IMPORTANT]
-> Snapshots and backups serve different purposes. Snapshots provide fast rollback before infrastructure changes, while independent backups provide recovery when the original system or storage is unavailable.
-
----
+The objective is to protect important data and make infrastructure changes recoverable. Snapshots provide convenient rollback around maintenance, while independent backups protect against failures that make the original system or storage unavailable.
 
 # Backup Architecture
 
-The current backup strategy follows a layered approach.
+![Original backup architecture](../diagrams/exported/backup-architecture.svg)
 
-![HomeLab Backup and Recovery Architecture](../diagrams/exported/backup-architecture.svg)
+*Earlier recovery architecture illustration; the table below includes the newer application-level recovery practices.*
 
-The diagram shows both the **current backup implementation** and the **target architecture**.
+| Recovery layer | Documented practice |
+| --- | --- |
+| Proxmox | Guest backups and snapshots around selected maintenance |
+| Home Assistant | Application-level backups and off-host copy |
+| Averli | Scheduled PostgreSQL backups and isolated restore verification |
+| Patrixa | Application backup procedure to be verified and documented |
 
-### Current Architecture
-
-The Proxmox host protects its workloads through multiple mechanisms:
-
-- **Home Assistant** creates application-level backups, with an off-host copy stored in Google Drive.
-- **Proxmox VM and LXC backups** are stored on the external 3 TB HDD.
-- **Infrastructure configuration** is maintained separately where appropriate, with sanitized configuration and documentation version-controlled through Git.
-- The external HDD currently contains both media and Proxmox backups.
-
-This creates an important shared failure domain:
-
-> The 3 TB HDD currently contains both primary media data and infrastructure backups. A physical failure of this disk could therefore affect both datasets.
-
-### Target Architecture
-
-The long-term objective is to separate the storage roles:
-
-```text
-Primary Storage
-      │
-      ▼
-Separate Backup Storage
-      │
-      ▼
-Off-site Copy
-```
-
-```text
-/mnt/media
-├── movies
-├── tv
-└── proxmox-backups
-```
-
-This is practical for the current HomeLab, although it creates a shared-storage failure domain. Separating media storage and infrastructure backups is therefore part of the planned improvements.
+The target design emphasizes independent recovery copies, capacity monitoring, retention review and periodic restore verification. A backup's existence is not evidence that it can be restored.
 
 ---
 
@@ -158,8 +116,8 @@ The backup target is currently an external HDD mounted on the Proxmox host.
 
 ```text
 Storage ID: backup-hdd
-Mount point: /mnt/media
-Backup directory: /mnt/media/proxmox-backups
+Mount point: /srv/example-media
+Backup directory: /srv/example-media/proxmox-backups
 ```
 
 The backup job uses:
@@ -206,6 +164,16 @@ Home Assistant backups are automatically replicated to Google Drive.
 This provides protection against scenarios where the Proxmox host or local storage becomes unavailable.
 
 The result is a basic form of geographic/off-site redundancy for one of the most important HomeLab workloads.
+
+---
+
+# Application Database Recovery
+
+Averli uses PostgreSQL and has scheduled database backups and an isolated restore verification procedure. This is distinct from guest-level recovery. The public documentation intentionally omits backup filenames, storage destinations, database identifiers and real application data.
+
+Patrixa is a separate budgeting application. Its backup design has not yet been confirmed and must not be inferred from Averli. The future documentation will record backup scope, freshness, restore evidence and ownership using sanitized examples.
+
+[Application hosting](application-hosting.md)
 
 ---
 
@@ -280,7 +248,7 @@ The filesystem was selected to allow the drive to remain portable between Linux 
 The drive is mounted by Proxmox at:
 
 ```bash
-/mnt/media
+/srv/example-media
 ```
 
 A critical requirement discovered during operation is that external storage must **not prevent the hypervisor from booting** if the device is disconnected or unavailable.
@@ -294,7 +262,7 @@ nofail
 Conceptually:
 
 ```text
-UUID=<disk-uuid> /mnt/media exfat defaults,nofail 0 0
+UUID=<disk-uuid> /srv/example-media exfat defaults,nofail 0 0
 ```
 
 The real UUID is intentionally omitted from public documentation.
@@ -313,7 +281,7 @@ Proxmox entered emergency mode with errors similar to:
 
 ```text
 Timed out waiting for device
-Dependency failed for /mnt/media
+Dependency failed for /srv/example-media
 Dependency failed for local-fs.target
 ```
 
@@ -627,21 +595,9 @@ The current backup strategy is designed to address several failure scenarios.
 
 # Backup Limitations
 
-The current design is functional but not yet a complete enterprise-style backup architecture.
+Backup resilience remains a development priority. Independent failure domains, verified recovery, sufficient capacity and clear retention policies must be evaluated separately.
 
-The largest limitation is that the external 3 TB HDD currently stores both:
-
-```text
-Media data
-+
-Proxmox backups
-```
-
-This means failure of the physical disk could affect both the primary media library and infrastructure backups stored on it.
-
-It therefore does not provide true physical redundancy.
-
-The Home Assistant Google Drive backup is currently the strongest off-host component of the backup architecture.
+Guest backups, application backups and snapshots address different recovery requirements. Maintain verified recovery copies before making storage or retention changes. The public repository does not reproduce live capacity readings or backup-storage details.
 
 ---
 
